@@ -1,5 +1,5 @@
 ---
-import type { Lang } from '@/i18n/ui';
+import { href, type Lang } from '@/i18n/ui';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -10,8 +10,9 @@ const ru = lang === 'ru';
   <div class="cookie__body">
     <p>
       {ru
-        ? 'Сайт использует cookie-файлы, чтобы работать корректно. Продолжая пользоваться сайтом, вы соглашаетесь с этим.'
-        : 'This site uses cookies to work properly. By continuing to use it, you agree to this.'}
+        ? 'Здесь нет рекламных и аналитических cookie. Браузер запомнит только, что вы закрыли это окно. '
+        : 'No advertising or analytics cookies here. Your browser only remembers that you closed this window. '}
+      <a href={href('privacy', lang)}>{ru ? 'Политика конфиденциальности' : 'Privacy policy'}</a>
     </p>
     <button class="btn cookie__ok" type="button" data-cookie-ok>{ru ? 'Понятно' : 'Got it'}</button>
   </div>
@@ -36,6 +37,7 @@ const ru = lang === 'ru';
 <style>
   .cookie { position: fixed; left: 20px; bottom: 20px; z-index: 60; width: min(380px, calc(100vw - 40px)); }
   .cookie__body { display: grid; gap: 14px; padding: 16px 18px 18px; font-size: 0.9rem; color: var(--text-soft); }
+  .cookie__body a { color: var(--berry); }
   .cookie__ok { justify-self: start; min-height: 40px; padding: 0 20px; }
   @media (max-width: 560px) { .cookie { left: 12px; right: 12px; bottom: 12px; width: auto; } }
 </style>
