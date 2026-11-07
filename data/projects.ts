@@ -135,8 +135,8 @@ export const projects: Project[] = [
       {
         title: { ru: 'Каналы', en: 'Channels' },
         text: {
-          ru: 'Telegram, VK и VK Клипы, Instagram, RUTUBE. Посевы в Telegram-каналах с афишами и у блогеров, медиапартнёрства, контекстная реклама за неделю до концерта.',
-          en: 'Telegram, VK and VK Clips, Instagram, RUTUBE. Placements in Telegram listings channels and with creators, media partnerships, search ads a week before each concert.',
+          ru: 'Telegram, VK и VK Клипы, Instagram*, RUTUBE. Посевы в Telegram-каналах с афишами и у блогеров, медиапартнёрства, контекстная реклама за неделю до концерта.',
+          en: 'Telegram, VK and VK Clips, Instagram*, RUTUBE. Placements in Telegram listings channels and with creators, media partnerships, search ads a week before each concert.',
         },
       },
       {
