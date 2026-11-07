@@ -1,10 +1,10 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
-// SITE и BASE задаются при публикации (см. README):
-//   свой домен  → SITE=https://vasilisatrunova.ru  BASE=/
-//   GitHub Pages → SITE=https://<логин>.github.io   BASE=/<репозиторий>/
+// The project source folders (pages, components, layouts, views, data) live at the repository root.
+// GitHub Actions supplies SITE and BASE for the project Pages URL.
 export default defineConfig({
+  srcDir: './',
   site: process.env.SITE || 'https://sliptruncat.github.io',
   base: process.env.BASE || '/',
   trailingSlash: 'always',
