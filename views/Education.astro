@@ -1,0 +1,93 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import { awards, certificates, degrees } from '@/data/education';
+import { publications } from '@/data/publications';
+import { teaching } from '@/data/site';
+import { tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+const totalHours = certificates.reduce((s, c) => s + c.hours, 0);
+---
+<Base lang={lang} title={ru ? 'Образование' : 'Education'} description={ru ? 'Образование Василисы Труновой: РАНХиГС, повышение квалификации, награды и публикации.' : 'Vasilisa Trunova’s education: RANEPA, professional development, awards and publications.'}>
+  <PageHero label="Education" title={ru ? 'Образование' : 'Education'} lead={ru ? 'РАНХиГС: бакалавриат с отличием и магистратура, шесть программ повышения квалификации, награды, публикации и преподавание.' : 'RANEPA: a Bachelor’s with honours and a Master’s, six professional development programmes, awards, publications and teaching.'} />
+
+  <section class="container section">
+    <ul class="degrees">
+      {degrees.map((d, i) => (
+        <li class:list={['degree', i === 0 ? 'tone-wine' : 'tone-surface', 'reveal']}>
+          <span class="num degree__period">{tr(d.period, lang)}</span>
+          <h2>{tr(d.title, lang)}</h2>
+          <p>{tr(d.detail, lang)}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="container section">
+    <div class="section-head">
+      <div>
+        <span class="label label--line reveal">{ru ? 'Повышение квалификации' : 'Professional development'}</span>
+        <h2 class="reveal">{ru ? '6 удостоверений РАНХиГС' : '6 RANEPA certificates'}</h2>
+        <p class="reveal">{ru ? `7 мая — 7 июня 2025 · ${totalHours} часов · удостоверения выданы 11 сентября 2025` : `7 May — 7 June 2025 · ${totalHours} hours · issued 11 September 2025`}</p>
+      </div>
+    </div>
+    <ul class="certs">
+      {certificates.map((c, i) => (
+        <li class="cert reveal">
+          <div class="window__bar"><span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span><span>certificate_0{i + 1}.pdf</span></div>
+          <div class="cert__body">
+            <span class="cert__seal" aria-hidden="true">РАНХиГС</span>
+            <strong>{tr(c.title, lang)}</strong>
+            <span class="num">{c.hours} {ru ? 'часов' : 'hours'}</span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="container section edu-two">
+    <div>
+      <h2 class="reveal edu-h">{ru ? 'Награды и конференции' : 'Awards & conferences'}</h2>
+      <ul class="awards">{awards.map((a) => <li class="reveal">{a.year && <span class="num">{a.year}</span>}<span>{tr(a.title, lang)}</span></li>)}</ul>
+    </div>
+    <div>
+      <h2 class="reveal edu-h">{ru ? 'Преподавание' : 'Teaching'}</h2>
+      <ul class="awards">{teaching.items.map((x) => <li class="reveal"><span class="num">{x.n}</span><span><strong>{tr(x.title, lang)}.</strong> {tr(x.text, lang)}</span></li>)}</ul>
+      <h2 class="reveal edu-h edu-h--gap">{ru ? 'Публикации' : 'Publications'}</h2>
+      <ul class="awards">
+        {publications.filter((p) => p.url).map((p) => (
+          <li class="reveal"><span class="num">{p.outlet}</span><a href={p.url} target="_blank" rel="noopener">{tr(p.title, lang)} ↗</a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .degrees { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+  .degree { display: grid; gap: 12px; padding: clamp(24px, 3vw, 40px); border-radius: var(--r-lg); background: var(--tone); color: var(--on-tone); border: 1px solid var(--line); }
+  .degree__period { font-size: 1.1rem; color: var(--berry); }
+  .tone-wine .degree__period { color: #f19ab0; }
+  .degree h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); }
+  .degree p { opacity: 0.85; }
+  .certs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .cert { border-radius: var(--r-md); overflow: hidden; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-window); transition: transform var(--dur) var(--ease); }
+  .cert:hover { transform: translateY(-4px) rotate(-0.5deg); }
+  .cert__body { display: grid; gap: 10px; padding: 22px; min-height: 150px; align-content: start; background: repeating-linear-gradient(45deg, transparent 0 14px, rgba(184, 64, 90, 0.03) 14px 28px); }
+  .cert__seal { justify-self: start; padding: 4px 10px; border: 1px solid var(--berry); border-radius: 999px; font: 600 0.7rem/1 var(--f-label); letter-spacing: 0.1em; color: var(--berry); }
+  .cert strong { font: 500 1.25rem/1.25 var(--f-display); }
+  .cert .num { color: var(--text-soft); }
+  .edu-two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); }
+  .edu-h { font-size: clamp(1.6rem, 2.4vw, 2.2rem); margin-bottom: 18px; }
+  .edu-h--gap { margin-top: 40px; }
+  .awards { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .awards li { display: grid; grid-template-columns: 90px 1fr; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+  .awards .num { color: var(--berry); font-size: 0.9rem; }
+  .awards a { text-decoration: none; }
+  .awards a:hover { color: var(--berry); }
+  @media (max-width: 900px) { .degrees, .edu-two { grid-template-columns: 1fr; } .certs { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .certs { grid-template-columns: 1fr; } .awards li { grid-template-columns: 1fr; gap: 4px; } }
+</style>

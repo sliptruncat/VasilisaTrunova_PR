@@ -1,0 +1,29 @@
+---
+import Base from '@/layouts/Base.astro';
+import FaqFlip from '@/components/FaqFlip.astro';
+import MatchCards from '@/components/MatchCards.astro';
+import ContactBlock from '@/components/ContactBlock.astro';
+import type { Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+---
+<Base lang={lang} title="FAQ" description={ru ? 'Частые вопросы о том, как работает Василиса Трунова: стратегия, СМИ, блогеры, реклама, аналитика.' : 'Frequently asked questions about how Vasilisa Trunova works: strategy, media, influencers, ads, analytics.'}>
+  <section class="container section faq-hero">
+    <span class="label label--line reveal">FAQ</span>
+    <h1 class="reveal">{ru ? 'Частые вопросы' : 'Frequently asked questions'}</h1>
+    <p class="lead reveal">{ru ? 'Нажмите на карточку, чтобы перевернуть её и прочитать ответ. Можно открыть сразу несколько.' : 'Tap a card to flip it and read the answer. You can open several at once.'}</p>
+  </section>
+  <section class="container section faq-grid">
+    <FaqFlip lang={lang} id="faq-page" />
+  </section>
+  <MatchCards lang={lang} />
+  <ContactBlock lang={lang} />
+</Base>
+
+<style>
+  .faq-hero { display: grid; gap: 18px; padding-top: clamp(32px, 5vw, 72px); }
+  .faq-hero .lead { max-width: 40rem; }
+  .faq-grid { padding-top: 40px; }
+</style>

@@ -1,0 +1,265 @@
+---
+import type { L } from '@/i18n/ui';
+import { href, tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+
+const statements: L[] = [
+  { ru: 'Мне важно, чтобы решения в коммуникациях опирались на исследования и данные, а не только на интуицию.', en: 'I want communication decisions to rest on research and data, not just intuition.' },
+  { ru: 'Я хочу понимать, как PR и маркетинг влияют на реальные бизнес-результаты.', en: 'I want to understand how PR and marketing affect real business results.' },
+  { ru: 'Мне нужен специалист, который сам ведёт проект от исследования до реализации.', en: 'I need someone who can run a project on their own, from research to delivery.' },
+  { ru: 'Я ценю инициативность и готовность предлагать решения, а не просто выполнять ТЗ.', en: 'I value initiative and proposing solutions, not just following a brief.' },
+  { ru: 'Мне важно, чтобы стратегия учитывала особенности аудитории, рынка и конкурентов.', en: 'Strategy should reflect the audience, the market and the competitors.' },
+  { ru: 'Я хочу видеть прозрачные KPI, понятные метрики и регулярную аналитику.', en: 'I want transparent KPIs, clear metrics and regular reporting.' },
+  { ru: 'Мне близок системный подход, но я не хочу терять креативность и нестандартные идеи.', en: 'I like a systematic approach, but don’t want to lose creativity and bold ideas.' },
+  { ru: 'Я ищу партнёра, который объединит стратегию, коммуникации, визуал и реализацию.', en: 'I’m looking for a partner who brings strategy, communications, visuals and delivery together.' },
+];
+
+const verdicts = [
+  { min: 0, text: { ru: 'Кажется, у нас разные подходы. Но это хороший повод обсудить задачи и найти точки соприкосновения.', en: 'Looks like our approaches differ. Still a good reason to talk through your goals and find common ground.' } },
+  { min: 40, text: { ru: 'У нас есть общие ориентиры. Возможно, нам стоит подробнее обсудить ваш проект.', en: 'We share some reference points. Maybe it’s worth discussing your project in more detail.' } },
+  { min: 70, text: { ru: 'Похоже, мы смотрим на коммуникации в одном направлении.', en: 'It seems we look at communications the same way.' } },
+  { min: 90, text: { ru: 'Кажется, мы отлично совпадаем. Пора знакомиться ближе.', en: 'Looks like a great match. Time to get to know each other.' } },
+];
+const i18n = {
+  of: ru ? 'из' : 'of',
+  result: ru ? 'У нас {p}% совпадения' : 'We are a {p}% match',
+  verdicts: verdicts.map((v) => ({ min: v.min, text: tr(v.text, lang) })),
+};
+---
+<section class="container section match" id="match" aria-labelledby="match-title">
+  <div class="match__head">
+    <span class="label label--line reveal">{ru ? 'Знакомство' : 'Getting to know each other'}</span>
+    <h2 id="match-title" class="reveal">{ru ? 'Подходим ли мы друг другу?' : 'Are we a good match?'}</h2>
+    <p class="lead reveal">{ru ? 'Несколько утверждений о том, как я работаю. Отмечайте то, что вам близко, и посмотрим, насколько мы совпадаем.' : 'A few statements about how I work. Mark what resonates with you and let’s see how well we match.'}</p>
+  </div>
+
+  <div class="match__stage reveal" data-match data-i18n={JSON.stringify(i18n)}>
+    <div class="match__progress" aria-hidden="true">
+      <span class="num" data-progress-text>1 {i18n.of} {statements.length}</span>
+      <span class="match__bar"><i data-progress-bar style="width:0%"></i></span>
+    </div>
+    <p class="visually-hidden" aria-live="polite" data-live></p>
+
+    <div class="match__deck" data-deck>
+      {statements.map((s, i) => (
+        <article class="mcard" data-card data-index={i} tabindex={i === 0 ? 0 : -1} hidden={i > 1} aria-hidden={i === 0 ? undefined : 'true'}
+          aria-label={`${i + 1} ${i18n.of} ${statements.length}`}>
+          <span class="mcard__stamp mcard__stamp--yes" aria-hidden="true">{ru ? 'ДА' : 'YES'}</span>
+          <span class="mcard__stamp mcard__stamp--no" aria-hidden="true">{ru ? 'НЕТ' : 'NO'}</span>
+          <span class="mcard__num num">{String(i + 1).padStart(2, '0')}</span>
+          <p class="mcard__text">{tr(s, lang)}</p>
+          <span class="mcard__hint" aria-hidden="true">{ru ? '← свайп или кнопки →' : '← swipe or use the buttons →'}</span>
+        </article>
+      ))}
+
+      <div class="match__result" data-result hidden tabindex="-1">
+        <span class="label">{ru ? 'Результат' : 'Result'}</span>
+        <p class="match__score display" data-score></p>
+        <p class="match__verdict" data-verdict></p>
+        <div class="match__actions">
+          <a class="btn" href={`${href('', lang)}#contact`}>{ru ? 'Обсудить мой проект' : 'Discuss my project'} <span class="arrow">↗</span></a>
+          <button type="button" class="btn btn--ghost" data-restart>{ru ? 'Пройти ещё раз' : 'Try again'}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="match__buttons" data-buttons>
+      <button type="button" class="mbtn mbtn--no" data-answer="0">
+        <span class="mbtn__ico" aria-hidden="true">✕</span>{ru ? 'Не совсем' : 'Not really'}
+      </button>
+      <button type="button" class="mbtn mbtn--yes" data-answer="1">
+        <span class="mbtn__ico" aria-hidden="true">♥</span>{ru ? 'Да, это про нас' : 'Yes, that’s us'}
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const root = document.querySelector<HTMLElement>('[data-match]');
+    if (!root || root.dataset.bound) return;
+    root.dataset.bound = '1';
+
+    const i18n = JSON.parse(root.dataset.i18n ?? '{}');
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+    const total = cards.length;
+    const result = root.querySelector<HTMLElement>('[data-result]')!;
+    const buttons = root.querySelector<HTMLElement>('[data-buttons]')!;
+    const answerBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-answer]')];
+    const progressText = root.querySelector<HTMLElement>('[data-progress-text]')!;
+    const progressBar = root.querySelector<HTMLElement>('[data-progress-bar]')!;
+    const live = root.querySelector<HTMLElement>('[data-live]')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let index = 0;
+    let yes = 0;
+    let busy = false; // blocks double answers while a card is flying out
+
+    const current = () => cards[index];
+    const setProgress = () => {
+      const shown = Math.min(index + 1, total);
+      progressText.textContent = `${shown} ${i18n.of} ${total}`;
+      progressBar.style.width = `${(Math.min(index, total) / total) * 100}%`; // share of answered cards
+    };
+    const layout = () => {
+      cards.forEach((c, i) => {
+        c.hidden = i < index || i > index + 1;
+        c.classList.toggle('is-next', i === index + 1);
+        c.classList.toggle('is-top', i === index);
+        c.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+        c.tabIndex = i === index ? 0 : -1;
+        c.style.transform = '';
+        c.style.removeProperty('--drag');
+      });
+      setProgress();
+    };
+
+    function answer(value: 0 | 1) {
+      if (busy || index >= total) return;
+      busy = true;
+      answerBtns.forEach((b) => (b.disabled = true));
+      const card = current();
+      if (value) yes++;
+      card.classList.add(value ? 'is-yes' : 'is-no');
+      card.style.transform = `translateX(${value ? 130 : -130}%) rotate(${value ? 16 : -16}deg)`;
+      card.classList.add('is-leaving');
+      const done = () => {
+        card.classList.remove('is-leaving', 'is-yes', 'is-no');
+        index++;
+        if (index >= total) finish();
+        else { layout(); current().focus({ preventScroll: true }); }
+        busy = false;
+        answerBtns.forEach((b) => (b.disabled = false));
+      };
+      reduced ? done() : setTimeout(done, 380);
+    }
+
+    function finish() {
+      cards.forEach((c) => (c.hidden = true));
+      buttons.hidden = true;
+      progressText.textContent = `${total} ${i18n.of} ${total}`;
+      progressBar.style.width = '100%';
+      const pct = Math.round((yes / total) * 100);
+      const verdict = [...i18n.verdicts].reverse().find((v: { min: number }) => pct >= v.min);
+      result.querySelector('[data-score]')!.textContent = i18n.result.replace('{p}', String(pct));
+      result.querySelector('[data-verdict]')!.textContent = verdict?.text ?? '';
+      result.hidden = false;
+      live.textContent = `${i18n.result.replace('{p}', String(pct))}. ${verdict?.text ?? ''}`;
+      result.focus({ preventScroll: true });
+    }
+
+    function restart() {
+      index = 0; yes = 0; busy = false;
+      result.hidden = true;
+      buttons.hidden = false;
+      layout();
+      current().focus({ preventScroll: true });
+    }
+
+    answerBtns.forEach((b) => b.addEventListener('click', () => answer(b.dataset.answer === '1' ? 1 : 0)));
+    root.querySelector('[data-restart]')?.addEventListener('click', restart);
+
+    // keyboard: ← / → on the focused card
+    root.addEventListener('keydown', (e) => {
+      if (!(e.target as HTMLElement).matches('[data-card]')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); answer(1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); answer(0); }
+    });
+
+    // drag / swipe with mouse or finger; vertical scrolling stays with the page (touch-action: pan-y)
+    cards.forEach((card) => {
+      let startX = 0, startY = 0, dx = 0, dragging = false, pid = -1;
+      card.addEventListener('pointerdown', (e) => {
+        if (busy || !card.classList.contains('is-top')) return;
+        dragging = true; pid = e.pointerId; startX = e.clientX; startY = e.clientY; dx = 0;
+        card.setPointerCapture(pid);
+        card.classList.add('is-dragging');
+      });
+      card.addEventListener('pointermove', (e) => {
+        if (!dragging || e.pointerId !== pid) return;
+        dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (Math.abs(dy) > Math.abs(dx) && Math.abs(dx) < 12) return;
+        card.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+        card.style.setProperty('--drag', String(Math.max(-1, Math.min(1, dx / 120))));
+        card.classList.toggle('is-yes', dx > 40);
+        card.classList.toggle('is-no', dx < -40);
+      });
+      const end = (e: PointerEvent) => {
+        if (!dragging || e.pointerId !== pid) return;
+        dragging = false;
+        card.classList.remove('is-dragging');
+        if (card.hasPointerCapture(pid)) card.releasePointerCapture(pid);
+        if (Math.abs(dx) > 110) answer(dx > 0 ? 1 : 0);
+        else { card.style.transform = ''; card.classList.remove('is-yes', 'is-no'); card.style.removeProperty('--drag'); }
+      };
+      card.addEventListener('pointerup', end);
+      card.addEventListener('pointercancel', end);
+    });
+
+    layout();
+  });
+</script>
+
+<style>
+  .match { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(28px, 6vw, 96px); align-items: center; }
+  .match__head { display: grid; gap: 18px; }
+  .match__head h2 { font-size: clamp(2.2rem, 4.4vw, 3.8rem); }
+  .match__stage { display: grid; gap: 22px; justify-items: center; padding: clamp(20px, 3vw, 36px); border-radius: var(--r-lg); background: var(--surface-2); border: 1px solid var(--line); }
+  .match__progress { width: min(460px, 100%); display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; }
+  .match__progress .num { font-size: 0.95rem; }
+  .match__bar { height: 6px; border-radius: 999px; background: rgba(36, 25, 26, 0.1); overflow: hidden; }
+  .match__bar i { display: block; height: 100%; background: var(--berry); border-radius: inherit; transition: width 0.4s var(--ease); }
+
+  .match__deck { position: relative; width: min(460px, 100%); height: 340px; }
+  .mcard {
+    position: absolute; inset: 0; display: flex; flex-direction: column; gap: 18px; padding: 30px 28px;
+    border-radius: 24px; background: var(--surface); border: 1px solid var(--line); box-shadow: 0 30px 50px -30px rgba(36, 25, 26, 0.5);
+    cursor: grab; user-select: none; touch-action: pan-y; transition: transform 0.38s var(--ease), opacity 0.38s, box-shadow 0.3s;
+  }
+  .mcard.is-dragging { cursor: grabbing; transition: none; }
+  .mcard.is-next { transform: translateY(14px) scale(0.95); opacity: 0.7; z-index: 0; pointer-events: none; }
+  .mcard.is-top { z-index: 2; }
+  .mcard.is-leaving { opacity: 0; }
+  .mcard:focus-visible { outline: 2px solid var(--berry); outline-offset: 4px; }
+  .mcard__num { color: var(--berry); font-size: 1rem; }
+  .mcard__text { font: 500 clamp(1.35rem, 2.2vw, 1.75rem)/1.3 var(--f-display); }
+  .mcard__hint { margin-top: auto; font-size: 0.8rem; color: var(--text-mute); }
+  .mcard__stamp {
+    position: absolute; top: 26px; padding: 6px 14px; border: 2px solid; border-radius: 10px;
+    font: 600 1.4rem/1 var(--f-label); letter-spacing: 0.12em; opacity: 0; transition: opacity 0.2s;
+  }
+  .mcard__stamp--yes { right: 24px; color: var(--berry); transform: rotate(10deg); }
+  .mcard__stamp--no { left: 24px; color: var(--mink); transform: rotate(-10deg); }
+  .mcard.is-yes { box-shadow: 0 30px 50px -30px rgba(184, 64, 90, 0.7); border-color: rgba(184, 64, 90, 0.5); }
+  .mcard.is-yes .mcard__stamp--yes, .mcard.is-no .mcard__stamp--no { opacity: 1; }
+
+  .match__buttons { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .mbtn {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 22px 0 10px; border-radius: 999px;
+    border: 1px solid var(--line-strong); background: var(--surface); cursor: pointer; font-weight: 600; transition: transform 0.25s var(--ease), background 0.2s, border-color 0.2s;
+  }
+  .mbtn:hover:not(:disabled) { transform: translateY(-2px); }
+  .mbtn:disabled { opacity: 0.5; cursor: default; }
+  .mbtn__ico { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--surface-2); }
+  .mbtn--yes { background: var(--wine); color: var(--bg); border-color: var(--wine); }
+  .mbtn--yes .mbtn__ico { background: var(--berry); color: #fffbf8; }
+
+  .match__result { position: absolute; inset: 0; display: grid; align-content: center; gap: 16px; padding: 30px 28px; border-radius: 24px; background: var(--wine); color: var(--bg); text-align: left; }
+  .match__result .label { color: var(--mauve); }
+  .match__score { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.05; }
+  .match__verdict { color: var(--mauve); }
+  .match__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .match__actions .btn--ghost { color: var(--bg); border-color: rgba(247, 240, 236, 0.35); }
+
+  @media (max-width: 900px) { .match { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .match__deck { height: 360px; }
+    .mcard, .match__result { padding: 24px 20px; }
+    .mbtn { flex: 1 1 100%; justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) { .mcard, .match__bar i { transition: none; } }
+</style>

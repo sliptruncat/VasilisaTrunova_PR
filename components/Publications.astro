@@ -1,0 +1,58 @@
+---
+import { publications } from '@/data/publications';
+import { tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+---
+<section class="container section" id="press">
+  <div class="section-head">
+    <div>
+      <span class="label label--line reveal">{ru ? 'Публикации' : 'Press'}</span>
+      <h2 class="reveal">{ru ? 'СМИ и публикации' : 'Media & publications'}</h2>
+    </div>
+  </div>
+  <ul class="press">
+    {publications.map((p) => (
+      <li class="reveal">
+        {p.url ? (
+          <a class="press__item" href={p.url} target="_blank" rel="noopener">
+            <span class="press__outlet">{p.outlet}</span>
+            <span class="press__title">{tr(p.title, lang)}</span>
+            <span class="press__meta"><span>{tr(p.date, lang)}</span><span>{tr(p.note, lang)}</span></span>
+            <span class="press__go" aria-hidden="true"><span class="arrow">↗</span></span>
+          </a>
+        ) : (
+          <div class="press__item press__item--todo todo">
+            <span class="press__outlet">{p.outlet}</span>
+            <span class="press__title">{tr(p.title, lang)}</span>
+            <span class="press__meta"><span>{tr(p.date, lang)}</span><span>{tr(p.note, lang)}</span></span>
+          </div>
+        )}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .press { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .press__item {
+    position: relative; display: grid; grid-template-columns: 220px 1fr 260px 48px; gap: 20px; align-items: center;
+    padding: 22px 0; border-bottom: 1px solid var(--line); text-decoration: none; transition: padding 0.3s var(--ease), background 0.3s;
+  }
+  a.press__item:hover { padding-left: 14px; background: linear-gradient(90deg, var(--berry-soft), transparent 70%); }
+  .press__outlet { font: 500 var(--fs-label)/1.3 var(--f-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--berry); }
+  .press__title { font: 500 clamp(1.1rem, 1.5vw, 1.35rem)/1.3 var(--f-display); }
+  .press__meta { display: grid; gap: 2px; font-size: 0.85rem; color: var(--text-soft); }
+  .press__go { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-strong); }
+  .press__item--todo { grid-template-columns: 220px 1fr 260px; border-radius: 0; border-width: 0 0 1px; border-style: solid; border-color: var(--line); background: none; padding: 22px 0; }
+  .press__item--todo::before { display: none; }
+  .press__item--todo .press__title, .press__item--todo .press__outlet { opacity: 0.7; }
+  .press__item--todo .press__meta span:last-child { color: var(--berry); }
+  @media (max-width: 860px) {
+    .press__item, .press__item--todo { grid-template-columns: 1fr auto; gap: 8px 16px; }
+    .press__outlet, .press__title, .press__meta { grid-column: 1; }
+    .press__go { grid-column: 2; grid-row: 1 / span 3; }
+  }
+</style>

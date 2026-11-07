@@ -1,0 +1,17 @@
+---
+interface Props { label: string; title: string; lead?: string }
+const { label, title, lead } = Astro.props;
+---
+<section class="container page-hero">
+  <span class="label label--line reveal">{label}</span>
+  <h1 class="reveal">{title}<span class="star" aria-hidden="true">✳</span></h1>
+  {lead && <p class="lead reveal">{lead}</p>}
+  <slot />
+</section>
+
+<style>
+  .page-hero { display: grid; gap: 18px; justify-items: start; padding-top: clamp(32px, 5vw, 72px); }
+  .page-hero h1 { font-size: clamp(2.8rem, 6.4vw, 5.6rem); line-height: 1; }
+  .page-hero h1 .star { font-size: 0.45em; vertical-align: top; margin-left: 0.08em; }
+  .page-hero .lead { max-width: 44rem; }
+</style>

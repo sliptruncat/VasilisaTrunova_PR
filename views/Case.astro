@@ -1,0 +1,411 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Folder from '@/components/Folder.astro';
+import { categories, getProject, type Project } from '@/data/projects';
+import { href, tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang; project: Project }
+const { lang, project: p } = Astro.props;
+const ru = lang === 'ru';
+
+const L = {
+  back: ru ? 'К кейсам' : 'Back to work',
+  client: ru ? 'Клиент' : 'Client',
+  period: ru ? 'Период' : 'Period',
+  role: ru ? 'Роль' : 'Role',
+  industry: ru ? 'Сфера' : 'Industry',
+  context: ru ? 'Контекст' : 'Context',
+  challenge: ru ? 'Задача' : 'Challenge',
+  objectives: ru ? 'Цели' : 'Objectives',
+  myRole: ru ? 'Моя роль' : 'My role',
+  strategy: ru ? 'Стратегия' : 'Strategy',
+  implementation: ru ? 'Реализация' : 'Execution',
+  materials: ru ? 'Материалы' : 'Creative materials',
+  results: ru ? 'Результаты' : 'Results',
+  tools: ru ? 'Инструменты' : 'Tools & platforms',
+  takeaways: ru ? 'Выводы' : 'Key takeaways',
+  related: ru ? 'Другие проекты' : 'Related projects',
+  todo: ru ? 'Что ещё добавить в кейс' : 'Still to add to this case',
+  open: ru ? 'Открыть фото' : 'Open photo',
+  close: ru ? 'Закрыть' : 'Close',
+  prev: ru ? 'Предыдущее фото' : 'Previous photo',
+  next: ru ? 'Следующее фото' : 'Next photo',
+  cta: ru ? 'Похожая задача? Обсудим.' : 'A similar challenge? Let’s talk.',
+  ctaBtn: ru ? 'Обсудить проект' : 'Discuss a project',
+};
+
+// gallery: cover first, then materials; large versions for the lightbox
+const gallery = [p.cover, ...p.materials].filter(Boolean) as NonNullable<Project['cover']>[];
+const large = await Promise.all(gallery.map((m) => getImage({ src: m.src, width: 1600, format: 'webp' })));
+const related = p.related.map(getProject).filter(Boolean) as Project[];
+const topResult = p.results[0];
+---
+<Base lang={lang} title={tr(p.title, lang)} description={tr(p.tagline, lang)}>
+  <article class="case">
+    <!-- cover -->
+    <header class="container case-hero">
+      <div class="case-hero__text">
+        <a class="case-back" href={href('work', lang)}>← {L.back}</a>
+        <p class="case-hero__kicker"><span class="num">{p.number}</span><span>/</span>{p.categories.map((c) => tr(categories[c], lang)).join(' · ')}</p>
+        <h1 class="reveal">{tr(p.title, lang)}<span class="star" aria-hidden="true">✳</span></h1>
+        <p class="lead reveal">{tr(p.tagline, lang)}</p>
+      </div>
+      <div class:list={['case-hero__media', `tone-${p.tone}`, 'reveal']}>
+        {gallery.length ? (
+          <div class="collage">
+            {gallery.slice(0, 3).map((m, i) => (
+              <button type="button" class:list={['collage__item', `collage__item--${i}`]} data-open={i} aria-label={`${L.open}: ${tr(m.alt, lang)}`}>
+                <Image src={m.src} alt={tr(m.alt, lang)} widths={[400, 700, 1000]} sizes="(max-width: 900px) 90vw, 40vw" loading="eager" />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div class="case-hero__folder"><Folder tone={p.tone} sheet={p.number} /></div>
+        )}
+      </div>
+    </header>
+
+    <!-- meta -->
+    <section class="container case-meta" aria-label={ru ? 'Коротко о проекте' : 'Project summary'}>
+      <dl class="meta">
+        <div><dt>{L.client}</dt><dd>{tr(p.client, lang)}</dd></div>
+        <div><dt>{L.industry}</dt><dd>{tr(p.industry, lang)}</dd></div>
+        <div><dt>{L.period}</dt><dd>{tr(p.period, lang)}</dd></div>
+        <div><dt>{L.role}</dt><dd>{tr(p.role, lang)}{p.team && <span class="meta__sub">{tr(p.team, lang)}</span>}</dd></div>
+        {topResult && <div class="meta__accent"><dt>{L.results}</dt><dd><b class="display">{topResult.value}</b>{tr(topResult.label, lang)}</dd></div>}
+      </dl>
+    </section>
+
+    <!-- context / challenge / role -->
+    <section class="container case-section case-intro">
+      <div id="context" class="case-block reveal">
+        <h2>{L.context}</h2>
+        <p>{tr(p.context, lang)}</p>
+      </div>
+      <div id="challenge" class="case-block reveal">
+        <h2>{L.challenge}</h2>
+        <p>{tr(p.challenge, lang)}</p>
+        <h3 class="case-sub">{L.objectives}</h3>
+        <ul class="ticks">{tr(p.objectives, lang).map((o) => <li>{o}</li>)}</ul>
+      </div>
+      <div id="role" class="case-block case-block--role reveal">
+        <h2>{L.myRole}</h2>
+        <p><strong>{tr(p.role, lang)}</strong>{p.team && <>. {tr(p.team, lang)}</>}</p>
+      </div>
+    </section>
+
+    <!-- strategy -->
+    {p.strategy.length > 0 && (
+      <section id="strategy" class="container case-section">
+        <h2 class="reveal">{L.strategy}</h2>
+        <ol class="flow">
+          {p.strategy.map((s, i) => (
+            <li class="reveal">
+              <span class="flow__n num">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{tr(s.title, lang)}</h3>
+              <p>{tr(s.text, lang)}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
+    <!-- research table -->
+    {p.table && (() => {
+      const tb = tr(p.table, lang);
+      return (
+        <section id="research" class="container case-section">
+          <h2 class="reveal">{tb.title}</h2>
+          {tb.note && <p class="table-note reveal">{tb.note}</p>}
+          <div class="table-wrap reveal" tabindex="0" role="region" aria-label={tb.title}>
+            <table class="dtable" style={`min-width:${Math.max(560, tb.head.length * 130)}px`}>
+              <thead><tr>{tb.head.map((h, i) => <th scope="col" class:list={[i === tb.highlightCol && 'is-hl']}>{h}</th>)}</tr></thead>
+              <tbody>
+                {tb.rows.map((r) => {
+                  let col = 1;
+                  return (
+                    <tr>
+                      <th scope="row">{r.label}</th>
+                      {r.cells.map((c) => {
+                        const span = c.span ?? 1;
+                        const hl = tb.highlightCol !== undefined && tb.highlightCol >= col && tb.highlightCol < col + span;
+                        col += span;
+                        return <td colspan={span} class:list={[hl && 'is-hl']}>{c.text}</td>;
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      );
+    })()}
+
+    <!-- implementation -->
+    <section id="implementation" class="container case-section case-impl">
+      <h2 class="reveal">{L.implementation}</h2>
+      <ul class="impl">{tr(p.implementation, lang).map((x, i) => <li class="reveal"><span class="num">{String(i + 1).padStart(2, '0')}</span>{x}</li>)}</ul>
+    </section>
+
+    <!-- materials / gallery -->
+    {gallery.length > 1 && (
+      <section id="materials" class="container case-section">
+        <div class="section-head">
+          <h2 class="reveal">{L.materials}</h2>
+          {p.materialsCredit && <p class="credit">{tr(p.materialsCredit, lang)}</p>}
+        </div>
+        <ul class="gallery">
+          {gallery.map((m, i) => (
+            <li class:list={['gallery__item', i % 5 === 0 && 'gallery__item--wide', 'reveal']}>
+              <button type="button" data-open={i} aria-label={`${L.open}: ${tr(m.alt, lang)}`}>
+                <Image src={m.src} alt={tr(m.alt, lang)} widths={[360, 640, 960]} sizes="(max-width: 700px) 92vw, 33vw" loading="lazy" />
+                <span class="gallery__zoom" aria-hidden="true">⤢</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <!-- results -->
+    <section id="results" class="container case-section">
+      <div class="results reveal">
+        <h2>{L.results}</h2>
+        {p.results.length > 0 && (
+          <ul class="results__nums">
+            {p.results.map((r) => <li><b class="display">{r.value}</b><span>{tr(r.label, lang)}</span></li>)}
+          </ul>
+        )}
+        {p.resultsNote && <p class="results__note">{tr(p.resultsNote, lang)}</p>}
+      </div>
+    </section>
+
+    <!-- tools + takeaways -->
+    <section class="container case-section case-two">
+      {p.tools.length > 0 && (
+        <div class="reveal">
+          <h2 class="h-small">{L.tools}</h2>
+          <ul class="chips">{p.tools.map((t) => <li class="chip">{t}</li>)}</ul>
+        </div>
+      )}
+      {tr(p.takeaways, lang).length > 0 && (
+        <div class="reveal">
+          <h2 class="h-small">{L.takeaways}</h2>
+          <ul class="takeaways">{tr(p.takeaways, lang).map((x) => <li>{x}</li>)}</ul>
+        </div>
+      )}
+    </section>
+
+    <!-- related -->
+    {related.length > 0 && (
+      <section class="container case-section">
+        <h2 class="reveal">{L.related}</h2>
+        <ul class="related">
+          {related.map((r) => (
+            <li class="reveal">
+              <a class:list={['rel', `tone-${r.tone}`]} href={href(`work/${r.slug}`, lang)}>
+                <Folder tone={r.tone} sheet={r.number} />
+                <span class="num">{r.number}</span>
+                <strong>{tr(r.title, lang)}</strong>
+                <span class="rel__meta">{tr(r.industry, lang)}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="container case-section">
+      <div class="case-cta reveal">
+        <h2>{L.cta}</h2>
+        <a class="btn" href={`${href('', lang)}#contact`}>{L.ctaBtn} <span class="arrow">↗</span></a>
+      </div>
+    </section>
+  </article>
+
+  <!-- lightbox -->
+  {gallery.length > 0 && (
+    <dialog class="lightbox" data-lightbox aria-label={L.materials}>
+      <button type="button" class="lb__close" data-lb-close aria-label={L.close}>✕</button>
+      <button type="button" class="lb__nav lb__nav--prev" data-lb-prev aria-label={L.prev}>←</button>
+      <figure class="lb__figure">
+        <img data-lb-img alt="" />
+        <figcaption data-lb-cap></figcaption>
+      </figure>
+      <button type="button" class="lb__nav lb__nav--next" data-lb-next aria-label={L.next}>→</button>
+      <script type="application/json" data-lb-data set:html={JSON.stringify(gallery.map((m, i) => ({ src: large[i].src, alt: tr(m.alt, lang) })))} />
+    </dialog>
+  )}
+</Base>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const dlg = document.querySelector<HTMLDialogElement>('[data-lightbox]');
+    if (!dlg || dlg.dataset.bound) return;
+    dlg.dataset.bound = '1';
+    const items: { src: string; alt: string }[] = JSON.parse(dlg.querySelector('[data-lb-data]')?.textContent ?? '[]');
+    const img = dlg.querySelector<HTMLImageElement>('[data-lb-img]')!;
+    const cap = dlg.querySelector<HTMLElement>('[data-lb-cap]')!;
+    let i = 0;
+    const show = (n: number) => {
+      i = (n + items.length) % items.length;
+      img.src = items[i].src; img.alt = items[i].alt;
+      cap.textContent = `${i + 1} / ${items.length} · ${items[i].alt}`;
+    };
+    document.querySelectorAll<HTMLButtonElement>('[data-open]').forEach((b) =>
+      b.addEventListener('click', () => { show(Number(b.dataset.open)); dlg.showModal(); }));
+    dlg.querySelector('[data-lb-close]')?.addEventListener('click', () => dlg.close());
+    dlg.querySelector('[data-lb-prev]')?.addEventListener('click', () => show(i - 1));
+    dlg.querySelector('[data-lb-next]')?.addEventListener('click', () => show(i + 1));
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); }); // click on backdrop
+    dlg.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(i - 1);
+      if (e.key === 'ArrowRight') show(i + 1);
+    });
+    if (items.length < 2) dlg.querySelectorAll<HTMLElement>('.lb__nav').forEach((n) => (n.hidden = true));
+  });
+</script>
+
+<style>
+  .case-hero { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 72px); align-items: center; padding-top: clamp(24px, 4vw, 56px); }
+  .case-hero__text { display: grid; gap: 18px; justify-items: start; }
+  .case-back { font-size: 0.9rem; text-decoration: none; color: var(--text-soft); }
+  .case-back:hover { color: var(--berry); }
+  .case-hero__kicker { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; font: 500 var(--fs-label)/1.4 var(--f-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-soft); }
+  .case-hero__kicker .num { font-size: 1.6rem; color: var(--text); letter-spacing: 0; }
+  .case-hero h1 { font-size: clamp(2.6rem, 5.4vw, 5rem); line-height: 1; }
+  .case-hero h1 .star { font-size: 0.5em; vertical-align: top; margin-left: 0.1em; }
+  .case-hero .lead { max-width: 36rem; }
+
+  .case-hero__media { position: relative; }
+  .collage { position: relative; aspect-ratio: 1 / 0.9; }
+  .collage__item { all: unset; position: absolute; cursor: zoom-in; border-radius: var(--r-md); overflow: hidden; box-shadow: var(--shadow-lift); border: 6px solid var(--surface); transition: transform 0.5s var(--ease); }
+  .collage__item:focus-visible { outline: 2px solid var(--berry); outline-offset: 3px; }
+  .collage__item :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .collage__item--0 { inset: 0 18% 22% 0; transform: rotate(-2deg); z-index: 1; }
+  .collage__item--1 { right: 0; top: 8%; width: 42%; aspect-ratio: 3 / 4; transform: rotate(4deg); z-index: 2; }
+  .collage__item--2 { left: 14%; bottom: 0; width: 46%; aspect-ratio: 4 / 3; transform: rotate(3deg); z-index: 3; }
+  .collage__item:hover { transform: rotate(0) scale(1.02); z-index: 4; }
+  .case-hero__folder { display: grid; place-items: center; aspect-ratio: 1 / 0.8; border-radius: var(--r-lg); background: var(--surface-2); border: 1px solid var(--line); }
+  .case-hero__folder :global(.folder) { width: min(320px, 70%); }
+
+  .case-meta { padding-top: clamp(40px, 5vw, 64px); }
+  .meta { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap); margin: 0; }
+  .meta > div { display: grid; gap: 8px; align-content: start; padding: 18px 20px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
+  .meta dt { font: 500 var(--fs-label)/1 var(--f-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mink); }
+  .meta dd { margin: 0; font-size: 0.95rem; line-height: 1.4; }
+  .meta__sub { display: block; color: var(--text-soft); font-size: 0.88rem; }
+  .meta__accent { background: var(--berry) !important; border-color: var(--berry) !important; color: #fffbf8; }
+  .meta__accent dt { color: rgba(255, 251, 248, 0.8); }
+  .meta__accent b { display: block; font-size: 2rem; line-height: 1; margin-bottom: 4px; }
+
+  .case-section { padding-top: clamp(56px, 7vw, 96px); }
+  .case-section > h2, .case-section .section-head h2 { margin-bottom: 26px; }
+  .case-intro { display: grid; grid-template-columns: 1fr 1fr 0.8fr; gap: clamp(20px, 3vw, 44px); align-items: start; }
+  .case-block { display: grid; gap: 14px; }
+  .case-block h2 { font-size: clamp(1.7rem, 2.6vw, 2.3rem); }
+  .case-block p { color: var(--text-soft); }
+  .case-block--role { padding: 24px; border-radius: var(--r-md); background: var(--surface-2); }
+  .case-block--role p { color: var(--text); }
+  .case-sub { font: 500 var(--fs-label)/1 var(--f-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mink); margin-top: 8px; }
+  .ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .ticks li { display: flex; gap: 10px; }
+  .ticks li::before { content: '✦'; color: var(--berry); }
+
+  .flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap); counter-reset: f; }
+  .flow li { position: relative; display: grid; gap: 10px; align-content: start; padding: 22px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
+  .flow li:not(:last-child)::after { content: '→'; position: absolute; right: -16px; top: 32px; z-index: 1; color: var(--mink); }
+  .flow__n { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--berry); color: #fffbf8; font-size: 1.1rem; }
+  .flow li:nth-child(4n + 2) .flow__n { background: var(--wine); }
+  .flow li:nth-child(4n + 3) .flow__n { background: var(--mulberry); }
+  .flow li:nth-child(4n + 4) .flow__n { background: var(--mink); }
+  .flow h3 { font-size: 1.2rem; }
+  .flow p { color: var(--text-soft); font-size: 0.93rem; }
+
+  .table-note { margin: -12px 0 20px; color: var(--text-soft); max-width: 46rem; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); }
+  .table-wrap:focus-visible { outline: 2px solid var(--berry); outline-offset: 3px; }
+  .dtable { width: 100%; border-collapse: collapse; font-size: 0.88rem; line-height: 1.4; }
+  .dtable th, .dtable td { padding: 14px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  .dtable thead th { position: sticky; top: 0; background: var(--surface-2); font: 600 0.78rem/1.3 var(--f-body); color: var(--text); }
+  .dtable tbody th { position: sticky; left: 0; z-index: 1; min-width: 170px; background: var(--surface); font-weight: 600; box-shadow: 1px 0 0 var(--line); }
+  .dtable thead th:first-child { position: sticky; left: 0; z-index: 2; }
+  .dtable td { color: var(--text-soft); }
+  .dtable td[colspan] { text-align: center; font-style: italic; }
+  .dtable .is-hl { background: var(--berry-soft); color: var(--text); font-weight: 500; }
+  .dtable thead .is-hl { background: var(--berry); color: #fffbf8; }
+  .dtable tbody tr:last-child th, .dtable tbody tr:last-child td { border-bottom: 0; }
+  .impl { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); border-top: 1px solid var(--line); }
+  .impl li { display: flex; gap: 16px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 1.05rem; }
+  .impl li:nth-child(odd) { padding-right: 24px; }
+  .impl .num { color: var(--berry); }
+
+  .credit { font-size: 0.85rem; color: var(--text-mute); }
+  .gallery { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 240px; grid-auto-flow: dense; gap: var(--gap); }
+  .gallery__item--wide { grid-column: span 2; grid-row: span 2; }
+  .gallery button { all: unset; position: relative; display: block; width: 100%; height: 100%; border-radius: var(--r-md); overflow: hidden; cursor: zoom-in; }
+  .gallery button:focus-visible { outline: 2px solid var(--berry); outline-offset: 3px; }
+  .gallery :global(img) { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s var(--ease); }
+  .gallery button:hover :global(img) { transform: scale(1.04); }
+  .gallery__zoom { position: absolute; right: 12px; bottom: 12px; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 251, 248, 0.9); opacity: 0; transition: opacity 0.3s; }
+  .gallery button:hover .gallery__zoom, .gallery button:focus-visible .gallery__zoom { opacity: 1; }
+
+  .results { display: grid; gap: 24px; padding: clamp(26px, 4vw, 52px); border-radius: var(--r-lg); background: var(--wine); color: var(--bg); }
+  .results__nums { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; }
+  .results__nums li { display: grid; gap: 8px; padding-left: 18px; border-left: 1px solid rgba(247, 240, 236, 0.25); }
+  .results__nums b { font-size: clamp(2.6rem, 5vw, 4.2rem); line-height: 1; color: #fffbf8; }
+  .results__nums span { color: var(--mauve); font-size: 0.95rem; }
+  .results__note { color: var(--mauve); max-width: 60rem; }
+
+  .case-two { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 64px); }
+  .h-small { font-size: clamp(1.5rem, 2.2vw, 2rem); margin-bottom: 18px; }
+  .takeaways { margin: 0; padding-left: 20px; display: grid; gap: 10px; font: italic 400 1.2rem/1.45 var(--f-display); }
+  .case-todo { font-size: 0.95rem; }
+
+  .related { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--gap); }
+  .rel { display: grid; gap: 6px; justify-items: start; padding: 20px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); text-decoration: none; transition: transform var(--dur) var(--ease), border-color 0.3s; }
+  .rel:hover { transform: translateY(-4px); border-color: rgba(184, 64, 90, 0.5); }
+  .rel :global(.folder) { width: 120px; margin-bottom: 10px; }
+  .rel .num { color: var(--mink); font-size: 0.82rem; }
+  .rel strong { font: 500 1.3rem/1.2 var(--f-display); }
+  .rel__meta { font-size: 0.85rem; color: var(--text-soft); }
+
+  .case-cta { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding: clamp(24px, 3.4vw, 44px); border-radius: var(--r-lg); background: var(--surface-2); border: 1px solid var(--line); }
+  .case-cta h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+
+  .lightbox { width: min(1100px, 94vw); max-height: 94vh; padding: 0; border: 0; border-radius: var(--r-md); background: transparent; overflow: visible; }
+  .lightbox::backdrop { background: rgba(26, 18, 19, 0.86); backdrop-filter: blur(4px); }
+  .lb__figure { margin: 0; display: grid; gap: 10px; justify-items: center; }
+  .lb__figure img { max-width: 100%; max-height: 82vh; border-radius: var(--r-sm); object-fit: contain; }
+  .lb__figure figcaption { color: var(--mauve); font-size: 0.9rem; text-align: center; }
+  .lb__close, .lb__nav { position: fixed; z-index: 2; width: 48px; height: 48px; border-radius: 50%; border: 1px solid rgba(247, 240, 236, 0.35); background: rgba(26, 18, 19, 0.6); color: #fffbf8; cursor: pointer; font-size: 1.1rem; }
+  .lb__close { top: 18px; right: 18px; }
+  .lb__nav--prev { left: 18px; top: 50%; transform: translateY(-50%); }
+  .lb__nav--next { right: 18px; top: 50%; transform: translateY(-50%); }
+  .lb__close:hover, .lb__nav:hover { background: var(--berry); border-color: var(--berry); }
+
+  @media (max-width: 1100px) {
+    .meta { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .case-intro { grid-template-columns: 1fr 1fr; }
+    .case-block--role { grid-column: 1 / -1; }
+  }
+  @media (max-width: 860px) {
+    .case-hero { grid-template-columns: 1fr; }
+    .case-hero__media { max-width: 560px; }
+    .flow li:not(:last-child)::after { display: none; }
+    .impl { grid-template-columns: 1fr; }
+    .impl li:nth-child(odd) { padding-right: 0; }
+    .gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 180px; }
+    .case-two { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .meta { grid-template-columns: 1fr 1fr; }
+    .meta__accent { grid-column: 1 / -1; }
+    .case-intro { grid-template-columns: 1fr; }
+    .gallery { grid-template-columns: 1fr; grid-auto-rows: 220px; }
+    .gallery__item--wide { grid-column: auto; grid-row: span 1; }
+    .lb__nav { top: auto; bottom: 18px; transform: none; }
+  }
+</style>

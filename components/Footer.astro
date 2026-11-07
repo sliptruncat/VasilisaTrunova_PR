@@ -1,0 +1,51 @@
+---
+import { contacts } from '@/data/site';
+import { href, useT, type Lang, type UiKey } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const links = ['work', 'about', 'experience', 'skills', 'education', 'services', 'faq', 'contact'] as const;
+---
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <span class="mark" aria-hidden="true">VT</span>
+      <div>
+        <strong>{lang === 'ru' ? 'Василиса Трунова' : 'Vasilisa Trunova'}</strong>
+        <span>PR &amp; Communications</span>
+      </div>
+    </div>
+    <nav aria-label={lang === 'ru' ? 'Разделы сайта' : 'Site sections'}>
+      <ul>{links.map((k) => <li><a href={href(k, lang)}>{t(`nav.${k}` as UiKey)}</a></li>)}</ul>
+    </nav>
+    <ul class="site-footer__social">
+      <li><a href={`https://t.me/${contacts.telegram}`} target="_blank" rel="noopener">Telegram</a></li>
+      <li><a href={`https://vk.com/${contacts.vk}`} target="_blank" rel="noopener">VK</a></li>
+      <li><a href={`mailto:${contacts.email}`}>Email</a></li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <span>© 2026 {lang === 'ru' ? 'Василиса Трунова' : 'Vasilisa Trunova'}. {t('footer.copy')}</span>
+    <span>{t('footer.rights')} <span class="star" aria-hidden="true">✳</span></span>
+  </div>
+</footer>
+
+<style>
+  .site-footer { margin-top: var(--section); border-top: 1px solid var(--line); padding-block: var(--s-6) var(--s-5); font-size: 0.9rem; }
+  .site-footer__inner { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s-6); align-items: center; }
+  .site-footer__brand { display: flex; align-items: center; gap: 12px; }
+  .site-footer__brand strong { display: block; font: 600 0.82rem/1.2 var(--f-label); letter-spacing: 0.08em; text-transform: uppercase; }
+  .site-footer__brand span { color: var(--text-soft); font-size: 0.8rem; }
+  .mark { font: 500 1.8rem/1 var(--f-display); }
+  nav ul, .site-footer__social { display: flex; flex-wrap: wrap; gap: 6px 22px; list-style: none; margin: 0; padding: 0; }
+  nav { justify-self: center; }
+  a { text-decoration: none; color: var(--text-soft); }
+  a:hover { color: var(--text); text-decoration: underline; }
+  .site-footer__bottom { display: flex; justify-content: space-between; gap: 12px; margin-top: var(--s-6); color: var(--text-mute); font-size: 0.8rem; }
+  @media (max-width: 900px) {
+    .site-footer__inner { grid-template-columns: 1fr; gap: var(--s-5); }
+    nav { justify-self: start; }
+    .site-footer__bottom { flex-direction: column; }
+  }
+</style>

@@ -1,0 +1,20 @@
+---
+import Base from '@/layouts/Base.astro';
+import ContactBlock from '@/components/ContactBlock.astro';
+import MatchCards from '@/components/MatchCards.astro';
+import type { Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+---
+<Base lang={lang} title={ru ? 'Контакты' : 'Contact'} description={ru ? 'Связаться с Василисой Труновой: Telegram, почта, форма заявки.' : 'Contact Vasilisa Trunova: Telegram, email, enquiry form.'}>
+  <div class="contact-page">
+    <ContactBlock lang={lang} asPage />
+  </div>
+  <MatchCards lang={lang} />
+</Base>
+
+<style>
+  .contact-page { padding-top: clamp(0px, 2vw, 24px); }
+</style>

@@ -1,0 +1,103 @@
+---
+import { alternate, href, useT, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const other: Lang = lang === 'ru' ? 'en' : 'ru';
+const path = Astro.url.pathname;
+
+const nav = [
+  { key: 'work', label: t('nav.work') },
+  { key: 'about', label: t('nav.about') },
+  { key: 'experience', label: t('nav.experience') },
+  { key: 'skills', label: t('nav.skills') },
+  { key: 'education', label: t('nav.education') },
+  { key: 'faq', label: t('nav.faq') },
+  { key: 'contact', label: t('nav.contact') },
+] as const;
+const isActive = (key: string) => path.includes(`/${key}/`);
+---
+<header class="site-header" data-header>
+  <div class="container site-header__inner">
+    <a class="logo" href={href('', lang)} aria-label={lang === 'ru' ? 'Василиса Трунова — на главную' : 'Vasilisa Trunova — home'}>{lang === 'ru' ? 'ВАСИЛИСА' : 'VASILISA'}<span>.PR</span></a>
+
+    <nav class="site-nav" aria-label={lang === 'ru' ? 'Основное меню' : 'Main navigation'} data-nav>
+      <ul>
+        {nav.map((n) => (
+          <li><a href={href(n.key, lang)} aria-current={isActive(n.key) ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+      <div class="site-nav__extra">
+        <span class="status"><i aria-hidden="true"></i>{t('status.available')}</span>
+      </div>
+    </nav>
+
+    <div class="site-header__actions">
+      <span class="status status--desktop"><i aria-hidden="true"></i>{t('status.available')}</span>
+      <a class="lang" href={alternate(path, other)} hreflang={other} lang={other} aria-label={t('lang.switch')}>
+        <span aria-current={lang === 'ru' ? 'true' : undefined}>RU</span><span aria-hidden="true">/</span><span aria-current={lang === 'en' ? 'true' : undefined}>EN</span>
+      </a>
+      <button class="burger" type="button" aria-expanded="false" aria-controls="site-nav" data-burger>
+        <span class="visually-hidden" data-open-label={t('nav.menu')} data-close-label={t('nav.close')}>{t('nav.menu')}</span>
+        <i></i><i></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 84%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent; transition: border-color 0.3s;
+  }
+  .site-header.is-scrolled { border-bottom-color: var(--line); }
+  .site-header__inner { display: flex; align-items: center; gap: var(--s-5); min-height: 72px; }
+  .logo { font: 600 1.35rem/1 var(--f-label); letter-spacing: 0.02em; text-decoration: none; text-transform: uppercase; }
+  .logo span { color: var(--mink); }
+
+  .site-nav { margin-inline: auto; }
+  .site-nav ul { display: flex; gap: 4px; list-style: none; margin: 0; padding: 0; }
+  .site-nav a {
+    display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px;
+    font-size: 0.95rem; text-decoration: none; color: var(--text-soft); transition: background 0.2s, color 0.2s;
+  }
+  .site-nav a:hover { color: var(--text); background: var(--surface-2); }
+  .site-nav a[aria-current='page'] { background: var(--berry); color: var(--lemon); }
+  .site-nav__extra { display: none; }
+
+  .site-header__actions { display: flex; align-items: center; gap: var(--s-4); }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--text-soft); white-space: nowrap; }
+  .status i { width: 9px; height: 9px; border-radius: 50%; background: var(--berry); box-shadow: 0 0 0 4px rgba(184, 64, 90, 0.18); animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 7px rgba(184, 64, 90, 0.04); } }
+
+  .lang { display: inline-flex; gap: 4px; align-items: center; min-height: 40px; padding: 0 12px; border: 1px solid var(--line-strong); border-radius: 999px; font: 500 0.8rem/1 var(--f-label); letter-spacing: 0.06em; text-decoration: none; color: var(--mink); }
+  .lang [aria-current='true'] { color: var(--text); }
+  .lang:hover { border-color: var(--text); }
+
+  .burger { display: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line-strong); background: transparent; cursor: pointer; position: relative; }
+  .burger i { position: absolute; left: 13px; right: 13px; height: 1.5px; background: var(--text); transition: transform 0.3s var(--ease); }
+  .burger i:first-of-type { top: 17px; }
+  .burger i:last-of-type { bottom: 17px; }
+  .burger[aria-expanded='true'] i:first-of-type { transform: translateY(4.5px) rotate(45deg); }
+  .burger[aria-expanded='true'] i:last-of-type { transform: translateY(-4.5px) rotate(-45deg); }
+
+  @media (max-width: 1180px) { .status--desktop { display: none; } }
+  @media (max-width: 1024px) {
+    .burger { display: inline-block; }
+    .site-header__actions { margin-left: auto; }
+    .site-nav {
+      position: fixed; inset: 72px 0 auto 0; margin: 0; padding: var(--s-5) var(--gutter) var(--s-7);
+      background: var(--bg); border-bottom: 1px solid var(--line); box-shadow: 0 30px 40px -30px rgba(36, 25, 26, 0.35);
+      transform: translateY(-12px); opacity: 0; visibility: hidden; transition: opacity 0.3s, transform 0.3s var(--ease), visibility 0.3s;
+    }
+    .site-nav.is-open { transform: none; opacity: 1; visibility: visible; }
+    .site-nav ul { flex-direction: column; gap: 2px; }
+    .site-nav a { min-height: 52px; padding: 0 4px; border-radius: 0; font: 500 1.7rem/1 var(--f-display); color: var(--text); border-bottom: 1px solid var(--line); width: 100%; }
+    .site-nav a:hover, .site-nav a[aria-current='page'] { background: transparent; color: var(--berry); }
+    .site-nav a[aria-current='page']::after { content: '•'; margin-left: 8px; color: var(--berry); }
+    .site-nav__extra { display: block; margin-top: var(--s-5); }
+  }
+</style>

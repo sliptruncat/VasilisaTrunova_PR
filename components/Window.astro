@@ -1,0 +1,23 @@
+---
+interface Props {
+  title?: string;
+  class?: string;
+  bodyClass?: string;
+  as?: 'div' | 'section' | 'article' | 'figure';
+}
+const { title, class: cls, bodyClass, as: Tag = 'div' } = Astro.props;
+---
+<Tag class:list={['window', cls]}>
+  <div class="window__bar">
+    <span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    {title && <span class="window__title">{title}</span>}
+    <slot name="bar" />
+  </div>
+  <div class:list={['window__body', bodyClass]}>
+    <slot />
+  </div>
+</Tag>
+
+<style>
+  .window__title { margin-left: 6px; }
+</style>

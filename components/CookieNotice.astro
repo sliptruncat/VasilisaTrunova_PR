@@ -1,0 +1,41 @@
+---
+import type { Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+---
+<div class="cookie window" data-cookie hidden role="region" aria-label={ru ? 'Уведомление о cookie' : 'Cookie notice'}>
+  <div class="window__bar"><span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span><span>cookies.txt</span></div>
+  <div class="cookie__body">
+    <p>
+      {ru
+        ? 'Сайт использует cookie-файлы, чтобы работать корректно. Продолжая пользоваться сайтом, вы соглашаетесь с этим.'
+        : 'This site uses cookies to work properly. By continuing to use it, you agree to this.'}
+    </p>
+    <button class="btn cookie__ok" type="button" data-cookie-ok>{ru ? 'Понятно' : 'Got it'}</button>
+  </div>
+</div>
+
+<script>
+  const KEY = 'cookie-ok';
+  document.addEventListener('astro:page-load', () => {
+    const box = document.querySelector<HTMLElement>('[data-cookie]');
+    if (!box) return;
+    let accepted = false;
+    try { accepted = localStorage.getItem(KEY) === '1'; } catch { /* storage blocked */ }
+    if (accepted) return;
+    box.hidden = false;
+    box.querySelector('[data-cookie-ok]')?.addEventListener('click', () => {
+      try { localStorage.setItem(KEY, '1'); } catch { /* storage blocked */ }
+      box.hidden = true;
+    }, { once: true });
+  });
+</script>
+
+<style>
+  .cookie { position: fixed; left: 20px; bottom: 20px; z-index: 60; width: min(380px, calc(100vw - 40px)); }
+  .cookie__body { display: grid; gap: 14px; padding: 16px 18px 18px; font-size: 0.9rem; color: var(--text-soft); }
+  .cookie__ok { justify-self: start; min-height: 40px; padding: 0 20px; }
+  @media (max-width: 560px) { .cookie { left: 12px; right: 12px; bottom: 12px; width: auto; } }
+</style>

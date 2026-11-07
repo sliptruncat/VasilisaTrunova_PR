@@ -1,0 +1,86 @@
+---
+import Folder from '@/components/Folder.astro';
+import { categories, type Project } from '@/data/projects';
+import { href, tr, type Lang } from '@/i18n/ui';
+
+interface Props { project: Project; lang: Lang }
+const { project: p, lang } = Astro.props;
+const ru = lang === 'ru';
+const url = href(`work/${p.slug}`, lang);
+
+// "Files" inside the folder = sections of the case page.
+const files = [
+  { name: ru ? 'контекст.txt' : 'context.txt', icon: 'txt', anchor: 'context' },
+  { name: ru ? 'задача.txt' : 'challenge.txt', icon: 'txt', anchor: 'challenge' },
+  p.strategy.length && { name: ru ? 'стратегия.doc' : 'strategy.doc', icon: 'doc', anchor: 'strategy' },
+  p.table && { name: tr(p.table, lang).file, icon: 'xls', anchor: 'research' },
+  { name: ru ? 'реализация.xlsx' : 'execution.xlsx', icon: 'xls', anchor: 'implementation' },
+  p.materials.length && { name: ru ? `фото (${p.materials.length})` : `photos (${p.materials.length})`, icon: 'img', anchor: 'materials' },
+  p.results.length && { name: ru ? 'результаты.pdf' : 'results.pdf', icon: 'pdf', anchor: 'results' },
+].filter(Boolean) as { name: string; icon: string; anchor: string }[];
+---
+<article class:list={['cf', `tone-${p.tone}`]}>
+  <a class="cf__link" href={url}>
+    <Folder tone={p.tone} sheet={p.number} />
+    <span class="cf__num num">{p.number}</span>
+    <h3 class="cf__title">{tr(p.title, lang)}</h3>
+    <span class="cf__meta">{tr(p.industry, lang)}</span>
+  </a>
+  <div class="cf__panel window" role="group" aria-label={ru ? `Файлы проекта ${tr(p.title, lang)}` : `${tr(p.title, lang)} project files`}>
+    <div class="window__bar">
+      <span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="cf__path">~/work/{p.slug.split('-').slice(0, 2).join('-')}</span>
+      <span class="cf__count num">{files.length} {ru ? 'файлов' : 'items'}</span>
+    </div>
+    <ul class="cf__files">
+      {files.map((f) => (
+        <li>
+          <a href={`${url}#${f.anchor}`}>
+            <span class:list={['ficon', `ficon--${f.icon}`]} aria-hidden="true">{f.icon}</span>
+            <span>{f.name}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="cf__foot">
+      <ul class="chips">{p.categories.slice(0, 3).map((c) => <li class="chip">{tr(categories[c], lang)}</li>)}</ul>
+      <a class="cf__open" href={url}>{ru ? 'Открыть папку' : 'Open folder'} <span class="arrow">↗</span></a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .cf { position: relative; }
+  .cf__link { display: grid; justify-items: start; gap: 6px; padding: 18px 18px 22px; border-radius: var(--r-md); text-decoration: none; transition: background 0.3s; }
+  .cf__link :global(.folder) { width: min(220px, 100%); margin: 0 auto 12px; }
+  .cf__num { font-size: 0.82rem; color: var(--mink); letter-spacing: 0.1em; }
+  .cf__title { font-size: clamp(1.35rem, 1.9vw, 1.7rem); }
+  .cf__meta { font-size: 0.88rem; color: var(--text-soft); }
+
+  /* hover panel — Finder-like list of the files inside */
+  .cf__panel {
+    position: absolute; left: 50%; top: -18px; z-index: 20; width: min(310px, 100% + 40px);
+    transform: translate(-50%, 16px) scale(0.94); transform-origin: 50% 30%;
+    opacity: 0; visibility: hidden; transition: opacity 0.3s, transform 0.35s var(--ease), visibility 0.3s;
+  }
+  .cf:hover .cf__panel, .cf:focus-within .cf__panel, .cf.is-open .cf__panel { opacity: 1; visibility: visible; transform: translate(-50%, 0) scale(1); }
+  .cf:hover .cf__link, .cf:focus-within .cf__link { background: rgba(184, 64, 90, 0.05); }
+  .cf__path { margin-left: 4px; font-family: var(--f-label); letter-spacing: 0.04em; }
+  .cf__count { margin-left: auto; color: var(--text-mute); }
+  .cf__files { list-style: none; margin: 0; padding: 8px; display: grid; gap: 2px; }
+  .cf__files a { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border-radius: 8px; text-decoration: none; font-size: 0.92rem; }
+  .cf__files a:hover, .cf__files a:focus-visible { background: var(--berry); color: var(--lemon); }
+  .ficon { flex: none; display: grid; place-items: center; width: 30px; height: 36px; border-radius: 4px 9px 4px 4px; font: 600 0.58rem/1 var(--f-label); letter-spacing: 0.06em; text-transform: uppercase; background: var(--mauve); color: var(--black); }
+  .ficon--doc { background: var(--mulberry); }
+  .ficon--xls { background: var(--lemon); }
+  .ficon--img { background: var(--berry); color: var(--lemon); }
+  .ficon--pdf { background: #e8a0b0; }
+  .cf__foot { display: grid; gap: 12px; padding: 12px 16px 16px; border-top: 1px solid var(--line); }
+  .cf__open { font-weight: 600; text-decoration: none; color: var(--berry); }
+
+  /* touch screens: no hover, so the file list sits under the folder */
+  @media (hover: none), (max-width: 760px) {
+    .cf__panel { position: static; width: auto; transform: none; opacity: 1; visibility: visible; margin-top: 4px; }
+    .cf__link { padding-bottom: 12px; }
+  }
+</style>

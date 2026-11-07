@@ -1,0 +1,100 @@
+---
+import { faq } from '@/data/faq';
+import { tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang; limit?: number; id?: string }
+const { lang, limit, id = 'faq' } = Astro.props;
+const ru = lang === 'ru';
+const items = limit ? faq.slice(0, limit) : faq;
+---
+<ul class="flips" data-flips>
+  {items.map((f, i) => {
+    const n = String(i + 1).padStart(2, '0');
+    const backId = `${id}-a-${i}`;
+    return (
+      <li class:list={['flip', f.wide && 'flip--wide', `flip--t${i % 4}`, 'reveal']}>
+        <button type="button" class="flip__card" aria-expanded="false" aria-controls={backId} data-flip>
+          <span class="flip__inner">
+            <span class="flip__face flip__front">
+              <span class="flip__top"><span class="num">{n}</span><span class="flip__tag">{tr(f.tag, lang)}</span></span>
+              <span class="flip__q">{tr(f.q, lang)}</span>
+              <span class="flip__hint"><span class="flip__icon" aria-hidden="true">↻</span>{ru ? 'Нажмите, чтобы узнать' : 'Tap to reveal'}</span>
+            </span>
+            <span class="flip__face flip__back" id={backId}>
+              <span class="flip__top"><span class="num">{n}</span><span class="flip__tag">{tr(f.tag, lang)}</span></span>
+              <span class="flip__a">{tr(f.a, lang)}</span>
+              <span class="flip__hint"><span class="flip__icon" aria-hidden="true">←</span>{ru ? 'Вернуться к вопросу' : 'Back to question'}</span>
+            </span>
+          </span>
+        </button>
+      </li>
+    );
+  })}
+</ul>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-flip]').forEach((btn) => {
+      if (btn.dataset.bound) return;
+      btn.dataset.bound = '1';
+      btn.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', String(open)); // each card flips on its own
+      });
+    });
+  });
+</script>
+
+<style>
+  .flips { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 270px; grid-auto-flow: dense; gap: var(--gap); list-style: none; margin: 0; padding: 0; }
+  .flip--wide { grid-column: span 2; }
+  .flip__card { all: unset; box-sizing: border-box; display: block; width: 100%; height: 100%; cursor: pointer; perspective: 1400px; border-radius: var(--r-lg); }
+  .flip__card:focus-visible { outline: 2px solid var(--berry); outline-offset: 4px; }
+  .flip__inner { position: relative; display: block; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.75s cubic-bezier(0.3, 0.7, 0.2, 1); }
+  .flip__card[aria-expanded='true'] .flip__inner { transform: rotateY(180deg); }
+  .flip__face {
+    position: absolute; inset: 0; display: flex; flex-direction: column; gap: 14px; padding: 24px;
+    border-radius: var(--r-lg); border: 1px solid var(--line); backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    background: var(--surface); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 14px 30px -24px rgba(36, 25, 26, 0.5);
+    transition: box-shadow 0.3s, border-color 0.3s;
+  }
+  .flip__back { transform: rotateY(180deg); background: var(--wine); color: var(--bg); border-color: var(--wine); }
+  /* rhythm: the fronts alternate between four quiet treatments */
+  .flip--t1 .flip__front { background: var(--surface-2); }
+  .flip--t2 .flip__front { background: var(--surface); border-style: dashed; border-color: var(--line-strong); }
+  .flip--t3 .flip__front { background: #f3e1e4; }
+  .flip--t3 .flip__back { background: var(--berry); border-color: var(--berry); }
+  .flip__card:hover .flip__front { border-color: rgba(184, 64, 90, 0.45); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8) inset, 0 20px 34px -22px rgba(36, 25, 26, 0.55); }
+  .flip__card:hover .flip__inner { transform: rotateY(-4deg); }
+  .flip__card[aria-expanded='true']:hover .flip__inner { transform: rotateY(176deg); }
+
+  .flip__top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .flip__top .num { color: var(--berry); }
+  .flip__back .flip__top .num { color: var(--lemon); }
+  .flip__tag { font: 500 0.7rem/1 var(--f-label); letter-spacing: 0.12em; text-transform: uppercase; color: var(--mink); padding: 6px 10px; border: 1px solid var(--line-strong); border-radius: 999px; }
+  .flip__back .flip__tag { color: var(--mauve); border-color: rgba(247, 240, 236, 0.25); }
+  .flip__q { font: 500 clamp(1.3rem, 1.7vw, 1.6rem)/1.2 var(--f-display); margin-top: auto; }
+  .flip--wide .flip__q { font-size: clamp(1.6rem, 2.4vw, 2.2rem); max-width: 18ch; }
+  .flip__a { font-size: 0.93rem; line-height: 1.5; overflow: auto; }
+  .flip--wide .flip__a { font-size: 1rem; }
+  .flip__hint { display: inline-flex; align-items: center; gap: 8px; margin-top: auto; font-size: 0.8rem; color: var(--text-mute); }
+  .flip__back .flip__hint { color: var(--mauve); }
+  .flip__icon { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid currentColor; font-size: 0.8rem; transition: transform 0.4s var(--ease); }
+  .flip__card:hover .flip__front .flip__icon { transform: rotate(180deg); }
+
+  @media (max-width: 1100px) { .flips { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 820px) { .flips { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 290px; } }
+  @media (max-width: 560px) {
+    .flips { grid-template-columns: 1fr; grid-auto-rows: auto; }
+    .flip--wide { grid-column: auto; }
+    .flip__card { height: auto; min-height: 240px; }
+    .flip__inner { min-height: 240px; display: grid; }
+    .flip__face { position: relative; grid-area: 1 / 1; min-height: 240px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flip__inner { transform: none !important; transition: none; }
+    .flip__back { transform: none; opacity: 0; visibility: hidden; }
+    .flip__card[aria-expanded='true'] .flip__back { opacity: 1; visibility: visible; }
+    .flip__card[aria-expanded='true'] .flip__front { visibility: hidden; }
+  }
+</style>

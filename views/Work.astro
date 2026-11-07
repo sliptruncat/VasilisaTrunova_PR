@@ -1,0 +1,105 @@
+---
+import Base from '@/layouts/Base.astro';
+import CaseFolder from '@/components/CaseFolder.astro';
+import Window from '@/components/Window.astro';
+import { categories, countByCategory, projects, type Category } from '@/data/projects';
+import { moreWork } from '@/data/site';
+import { tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+const keys = Object.keys(categories) as Category[];
+---
+<Base lang={lang} title={ru ? 'Кейсы' : 'Work'} description={ru ? 'Архив проектов Василисы Труновой: PR, маркетинг, ивенты, цифровое продвижение, бренд-стратегия.' : 'Project archive of Vasilisa Trunova: PR, marketing, events, digital, brand strategy.'}>
+  <section class="container work-hero">
+    <span class="label label--line reveal">Work · {projects.length} {ru ? 'проектов' : 'projects'}</span>
+    <h1 class="reveal">{ru ? 'Архив проектов' : 'Project archive'}</h1>
+    <p class="lead reveal">{ru ? 'Каждая папка — отдельный кейс: контекст, задача, стратегия, реализация и результаты. Наведите, чтобы заглянуть внутрь.' : 'Each folder is a case: context, challenge, strategy, execution and results. Hover to peek inside.'}</p>
+  </section>
+
+  <section class="container work-body">
+    <div class="filters reveal" role="group" aria-label={ru ? 'Фильтр по направлению' : 'Filter by category'} data-filters>
+      <button type="button" class="chip" aria-pressed="true" data-filter="all">{ru ? 'Все' : 'All'} <span class="num">{projects.length}</span></button>
+      {keys.map((k) => (
+        <button type="button" class="chip" aria-pressed="false" data-filter={k}>{tr(categories[k], lang)} <span class="num">{countByCategory(k)}</span></button>
+      ))}
+    </div>
+    <p class="visually-hidden" aria-live="polite" data-filter-live></p>
+
+    <ul class="grid" data-grid>
+      {projects.map((p) => <li data-cats={p.categories.join(' ')}><CaseFolder project={p} lang={lang} /></li>)}
+    </ul>
+    <p class="empty" data-empty hidden>{ru ? 'В этой категории пока нет кейсов.' : 'No cases in this category yet.'}</p>
+  </section>
+
+  <section class="container work-more">
+    <h2 class="reveal">{ru ? 'Ещё проекты' : 'More projects'}</h2>
+    <ul class="more">
+      {moreWork.map((w) => (
+        <li class="reveal">
+          <Window title={`${w.file}.txt`} bodyClass="mw__body">
+            <span class="chip chip--accent">{tr(w.tag, lang)}</span>
+            <h3>{tr(w.title, lang)}</h3>
+            <p class="mw__role">{tr(w.role, lang)}</p>
+            <p class="mw__text">{tr(w.text, lang)}</p>
+            <ul class="mw__metrics">{tr(w.metrics, lang).map((m) => <li>{m}</li>)}</ul>
+          </Window>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const wrap = document.querySelector<HTMLElement>('[data-filters]');
+    if (!wrap) return;
+    const btns = [...wrap.querySelectorAll<HTMLButtonElement>('[data-filter]')];
+    const items = [...document.querySelectorAll<HTMLElement>('[data-grid] > li')];
+    const empty = document.querySelector<HTMLElement>('[data-empty]');
+    const live = document.querySelector<HTMLElement>('[data-filter-live]');
+    const apply = (key: string, push = true) => {
+      btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === key)));
+      let shown = 0;
+      items.forEach((li) => {
+        const on = key === 'all' || (li.dataset.cats ?? '').split(' ').includes(key);
+        li.hidden = !on;
+        if (on) { shown++; li.classList.remove('pop'); void li.offsetWidth; li.classList.add('pop'); }
+      });
+      if (empty) empty.hidden = shown > 0;
+      if (live) live.textContent = String(shown);
+      if (push) {
+        const url = new URL(location.href);
+        key === 'all' ? url.searchParams.delete('c') : url.searchParams.set('c', key);
+        history.replaceState(history.state, '', url);
+      }
+    };
+    btns.forEach((b) => b.addEventListener('click', () => apply(b.dataset.filter ?? 'all')));
+    const initial = new URL(location.href).searchParams.get('c');
+    if (initial && btns.some((b) => b.dataset.filter === initial)) apply(initial, false);
+  });
+</script>
+
+<style>
+  .work-hero { display: grid; gap: 18px; padding-top: clamp(32px, 5vw, 72px); }
+  .work-hero .lead { max-width: 42rem; }
+  .work-body { padding-top: 40px; }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 30px; }
+  .filters .chip { min-height: 40px; padding: 0 16px; gap: 8px; font-size: 0.9rem; }
+  .filters .chip .num { font-size: 0.78rem; opacity: 0.7; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 30px var(--gap); list-style: none; margin: 0; padding: 0; }
+  .grid > li.pop { animation: pop 0.45s var(--ease); }
+  @keyframes pop { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+  .empty { padding: 40px 0; color: var(--text-soft); }
+  .work-more { padding-top: clamp(56px, 7vw, 96px); }
+  .work-more h2 { margin-bottom: 24px; }
+  .more { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); list-style: none; margin: 0; padding: 0; }
+  .more :global(.mw__body) { display: grid; gap: 12px; align-content: start; }
+  .more .chip { justify-self: start; }
+  .mw__role { margin-top: -6px; font-size: 0.88rem; color: var(--mink); }
+  .mw__text { color: var(--text-soft); font-size: 0.95rem; }
+  .mw__metrics { list-style: none; margin: 4px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; }
+  .mw__metrics li::before { content: '✦ '; color: var(--berry); }
+  @media (max-width: 760px) { .more { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,446 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Window from '@/components/Window.astro';
+import CaseFolder from '@/components/CaseFolder.astro';
+import ContactBlock from '@/components/ContactBlock.astro';
+import FaqFlip from '@/components/FaqFlip.astro';
+import MatchCards from '@/components/MatchCards.astro';
+import Publications from '@/components/Publications.astro';
+import { href, tr, useT, type Lang } from '@/i18n/ui';
+import { approach, hero, intro, stats, contacts, teaching, moreWork } from '@/data/site';
+import { projects } from '@/data/projects';
+import { roles, timelineYears } from '@/data/experience';
+import { services } from '@/data/services';
+import { skillGroups } from '@/data/skills';
+import { degrees, certificates } from '@/data/education';
+import { testimonials } from '@/data/testimonials';
+import portrait from '@/assets/img/me/portrait.jpg';
+import eventPhoto from '@/assets/img/me/event-neon.jpg';
+import testdrive from '@/assets/img/me/testdrive.jpg';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useT(lang);
+const ru = lang === 'ru';
+
+const copy = {
+  selected: { ru: 'Избранные кейсы', en: 'Selected work' },
+  selectedNote: { ru: 'Наведите на папку, чтобы заглянуть внутрь. Внутри — задача, стратегия, реализация и результаты.', en: 'Hover over a folder to peek inside: the challenge, strategy, execution and results.' },
+  more: { ru: 'Ещё проекты', en: 'More projects' },
+  what: { ru: 'Что делала', en: 'What I did' },
+  numbers: { ru: 'Опыт в цифрах', en: 'Experience in numbers' },
+  timeline: { ru: 'Таймлайн', en: 'Timeline' },
+  pick: { ru: 'Нажмите на год, чтобы увидеть, чем я занималась', en: 'Pick a year to see what I was doing' },
+  services: { ru: 'Чем могу помочь', en: 'How I can help' },
+  allServices: { ru: 'Все услуги', en: 'All services' },
+  skills: { ru: 'Навыки и инструменты', en: 'Skills & tools' },
+  education: { ru: 'Образование и события', en: 'Education & events' },
+  testimonials: { ru: 'Из рекомендательных писем', en: 'From recommendation letters' },
+  photoAlt: { ru: 'Портрет Василисы Труновой', en: 'Portrait of Vasilisa Trunova' },
+  eventAlt: { ru: 'Василиса на мероприятии', en: 'Vasilisa at an event' },
+};
+const currentYear = 2026;
+const kindLabel = {
+  work: { ru: 'Работа', en: 'Work' }, project: { ru: 'Проект', en: 'Project' },
+  education: { ru: 'Учёба', en: 'Education' }, teaching: { ru: 'Преподавание', en: 'Teaching' },
+};
+const cvUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${contacts.cv}`;
+const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length;
+---
+<Base lang={lang}>
+  <!-- HERO -->
+  <section class="hero container">
+    <div class="hero__text">
+      <p class="label label--line reveal">{tr(hero.eyebrow, lang)}</p>
+      <h1 class="hero__title" aria-label={ru ? 'Василиса Трунова' : 'Vasilisa Trunova'}>
+        <span class="hero__line reveal">{ru ? 'Василиса' : 'Vasilisa'}<span class="star" aria-hidden="true">✳</span></span>
+        <span class="hero__line reveal">{ru ? 'Трунова' : 'Trunova'}</span>
+      </h1>
+      <p class="lead reveal">{tr(hero.lead, lang)}</p>
+      <div class="hero__cta reveal">
+        <a class="btn" href="#work">{t('cta.cases')} <span class="arrow">↘</span></a>
+        <a class="btn btn--ghost" href={href('about', lang)}>{t('cta.about')}</a>
+        <a class="btn btn--ghost" href={cvUrl} download>{ru ? 'Резюме PDF' : 'CV (PDF)'} <span class="arrow arrow--down">↓</span></a>
+      </div>
+    </div>
+    <div class="hero__visual reveal">
+      <Window class="hero__window" bodyClass="hero__window-body" title="vasilisa_trunova.jpg">
+        <Image src={portrait} alt={tr(copy.photoAlt, lang)} widths={[480, 760, 1100]} sizes="(max-width: 768px) 84vw, 40vw" loading="eager" fetchpriority="high" class="hero__photo" />
+      </Window>
+      <ul class="hero__contacts" aria-label={t('nav.contact')}>
+        <li><a href={`mailto:${contacts.email}`}><span class="ico" aria-hidden="true">✉</span>{contacts.email}</a></li>
+        <li><a href={`https://t.me/${contacts.telegram}`} target="_blank" rel="noopener"><span class="ico" aria-hidden="true">✈</span>@{contacts.telegram}</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SELECTED WORK: folders -->
+  <section class="container section" id="work">
+    <div class="section-head">
+      <div>
+        <span class="label label--line reveal">Work</span>
+        <h2 class="reveal">{tr(copy.selected, lang)}</h2>
+        <p class="reveal">{tr(copy.selectedNote, lang)}</p>
+      </div>
+      <a class="link reveal" href={href('work', lang)}>{t('cta.allProjects')} <span class="arrow">↗</span></a>
+    </div>
+    <ul class="folders">
+      {projects.map((p) => <li class="reveal"><CaseFolder project={p} lang={lang} /></li>)}
+    </ul>
+
+    <!-- smaller projects as windows -->
+    <h3 class="more__title reveal">{tr(copy.more, lang)}</h3>
+    <ul class="more">
+      {moreWork.map((w) => (
+        <li class="reveal">
+          <Window title={`${w.file}.txt`} class:list={['mw', w.accent && 'mw--accent']} bodyClass="mw__body">
+            <span class="chip chip--accent mw__tag">{tr(w.tag, lang)}</span>
+            <h3>{tr(w.title, lang)}</h3>
+            <p class="mw__role">{tr(w.role, lang)}</p>
+            <p class="mw__text">{tr(w.text, lang)}</p>
+            <details>
+              <summary>{tr(copy.what, lang)}</summary>
+              <ul>{tr(w.details, lang).map((d) => <li>{d}</li>)}</ul>
+            </details>
+            <ul class="mw__metrics">{tr(w.metrics, lang).map((m) => <li>{m}</li>)}</ul>
+          </Window>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- INTRO -->
+  <section class="container section intro">
+    <div class="intro__media reveal">
+      <Image src={eventPhoto} alt={tr(copy.eventAlt, lang)} widths={[400, 700]} sizes="(max-width: 768px) 88vw, 34vw" loading="lazy" />
+      <span class="intro__tag hand">PR · events · media</span>
+    </div>
+    <div class="intro__text">
+      <p class="label label--line reveal">{t('nav.about')}</p>
+      <h2 class="reveal">{tr(intro.title, lang)}</h2>
+      <p class="lead reveal">{tr(intro.text, lang)}</p>
+      <a class="link reveal" href={href('about', lang)}>{t('cta.more')} <span class="arrow">↗</span></a>
+    </div>
+  </section>
+
+  <!-- NUMBERS + TIMELINE -->
+  <section class="container section dash">
+    <div class="dash__stats">
+      <h2 class="reveal">{tr(copy.numbers, lang)}</h2>
+      <ul class="stats">
+        {stats.map((s) => (
+          <li class:list={['stat', `tone-${s.tone}`, 'reveal']}>
+            <b class="stat__value display" data-count={s.value} data-suffix={s.suffix}>{s.value}{s.suffix}</b>
+            <span>{tr(s.label, lang)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <Window title={tr(copy.timeline, lang)} class="timeline reveal" bodyClass="timeline__body">
+      <div class="timeline__range num" aria-hidden="true">{timelineYears[0]} — {currentYear}</div>
+      <p class="timeline__hint">{tr(copy.pick, lang)}</p>
+      <div class="timeline__years" data-years>
+        {timelineYears.map((y) => (
+          <button type="button" class="timeline__year num" aria-expanded="false" aria-controls="year-panel" data-year={y}>
+            {y}<span class="timeline__dot" aria-hidden="true">{yearCount(y)}</span>
+          </button>
+        ))}
+      </div>
+      <div class="timeline__drop" id="year-panel" data-drop>
+        <div class="timeline__drop-inner">
+          <p class="timeline__drop-head num" data-drop-head></p>
+          <ul class="timeline__list">
+            {roles.map((r) => (
+              <li data-role-years={r.years.join(',')} hidden>
+                <span class="label">{tr(kindLabel[r.kind], lang)} · {tr(r.period, lang)}</span>
+                <strong>{tr(r.org, lang)}</strong>
+                <span>{tr(r.role, lang)}</span>
+                <ul class="timeline__points">{tr(r.points, lang).map((pt) => <li>{pt}</li>)}</ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <a class="link timeline__more" href={href('experience', lang)}>{t('nav.experience')} <span class="arrow">↗</span></a>
+    </Window>
+  </section>
+
+  <!-- APPROACH (style of the first portfolio) -->
+  <section class="container section">
+    <div class="section-head"><div><span class="label label--line reveal">{ru ? 'Подход' : 'Approach'}</span><h2 class="reveal">{tr(approach.title, lang)}</h2></div></div>
+    <ol class="steps">
+      {approach.steps.map((s) => <li class="reveal"><h3>{tr(s.title, lang)}</h3><p>{tr(s.text, lang)}</p></li>)}
+    </ol>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="container section">
+    <div class="section-head">
+      <div><span class="label label--line reveal">Services</span><h2 class="reveal">{tr(copy.services, lang)}</h2></div>
+      <a class="link reveal" href={href('services', lang)}>{tr(copy.allServices, lang)} <span class="arrow">↗</span></a>
+    </div>
+    <ul class="services">
+      {services.slice(0, 6).map((s, i) => (
+        <li class="service reveal">
+          <span class="num">{String(i + 1).padStart(2, '0')}</span>
+          <h3>{tr(s.title, lang)}</h3>
+          <p class="service__task">{tr(s.task, lang)}</p>
+          <p class="service__out">→ {tr(s.outcome, lang)}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- TEACHING (from the first portfolio) -->
+  <section class="container section">
+    <div class="section-head"><div><span class="label label--line reveal">{ru ? 'Лекции и наставничество' : 'Teaching & mentoring'}</span><h2 class="reveal">{tr(teaching.title, lang)}</h2></div></div>
+    <div class="teach-grid">
+      {teaching.items.map((x) => (
+        <div class="teach reveal"><b class="display">{x.n}</b><h3>{tr(x.title, lang)}</h3><p>{tr(x.text, lang)}</p></div>
+      ))}
+      <figure class="teach teach--photo reveal">
+        <Image src={testdrive} alt={tr(teaching.photoCaption, lang)} widths={[500, 800]} sizes="(max-width: 768px) 92vw, 40vw" loading="lazy" />
+        <figcaption>{tr(teaching.photoCaption, lang)}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <Publications lang={lang} />
+
+  <!-- SKILLS + EDUCATION previews -->
+  <section class="container section previews">
+    <a class="preview reveal" href={href('skills', lang)}>
+      <h2>{tr(copy.skills, lang)}</h2>
+      <ul class="chips">{skillGroups.flatMap((g) => g.tools).slice(0, 12).map((tool) => <li class="chip">{tool}</li>)}</ul>
+      <span class="preview__go" aria-hidden="true"><span class="arrow">↗</span></span>
+    </a>
+    <a class="preview preview--accent reveal" href={href('education', lang)}>
+      <h2>{tr(copy.education, lang)}</h2>
+      <ul class="preview__list">{degrees.map((d) => <li><span class="num">{tr(d.period, lang)}</span>{tr(d.title, lang)} — {tr(d.detail, lang)}</li>)}</ul>
+      <div class="preview__certs">
+        <span class="num">{ru ? '6 удостоверений о повышении квалификации · РАНХиГС, 2025' : '6 professional development certificates · RANEPA, 2025'}</span>
+        <ul class="chips">{certificates.map((c) => <li class="chip">{tr(c.title, lang)} · {c.hours} {ru ? 'ч' : 'h'}</li>)}</ul>
+      </div>
+      <span class="preview__go" aria-hidden="true"><span class="arrow">↗</span></span>
+    </a>
+  </section>
+
+  <!-- TESTIMONIALS (real letters, company only) -->
+  <section class="container section">
+    <div class="section-head"><div><span class="label label--line reveal">References</span><h2 class="reveal">{tr(copy.testimonials, lang)}</h2></div></div>
+    <ul class="quotes">
+      {testimonials.map((q) => (
+        <li class="reveal"><figure class="quote"><blockquote>{tr(q.quote, lang)}</blockquote><figcaption>{tr(q.company, lang)}</figcaption></figure></li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- FAQ (flip cards) -->
+  <section class="container section">
+    <div class="section-head">
+      <div><span class="label label--line reveal">FAQ</span><h2 class="reveal">{ru ? 'Частые вопросы' : 'Frequently asked'}</h2></div>
+      <a class="link reveal" href={href('faq', lang)}>{ru ? 'Все вопросы' : 'All questions'} <span class="arrow">↗</span></a>
+    </div>
+    <FaqFlip lang={lang} limit={6} id="home-faq" />
+  </section>
+
+  <MatchCards lang={lang} />
+
+  <!-- CONTACT (as in the first portfolio) -->
+  <ContactBlock lang={lang} />
+</Base>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const tabs = document.querySelectorAll<HTMLButtonElement>('[data-year]');
+    const drop = document.querySelector<HTMLElement>('[data-drop]');
+    const head = document.querySelector<HTMLElement>('[data-drop-head]');
+    const items = document.querySelectorAll<HTMLElement>('[data-role-years]');
+    if (!drop) return;
+    tabs.forEach((btn) => btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      tabs.forEach((b) => b.setAttribute('aria-expanded', 'false'));
+      if (open) { drop.classList.remove('is-open'); return; }
+      btn.setAttribute('aria-expanded', 'true');
+      const y = btn.dataset.year ?? '';
+      items.forEach((li) => { li.hidden = !(li.dataset.roleYears ?? '').split(',').includes(y); });
+      if (head) head.textContent = y;
+      drop.classList.add('is-open');
+    }));
+  });
+</script>
+
+<style>
+  /* hero */
+  .hero { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: clamp(24px, 5vw, 72px); align-items: center; padding-top: clamp(28px, 5vw, 64px); }
+  .hero__title { font-size: var(--fs-hero); line-height: 0.92; letter-spacing: -0.035em; margin: 18px 0 26px; text-transform: uppercase; }
+  .hero__line { display: block; white-space: nowrap; }
+  .hero__title:lang(ru), :global(html[lang='ru']) .hero__title { font-size: clamp(2.9rem, 7.2vw, 7rem); }
+  .hero__title .star { font-size: 0.42em; vertical-align: top; margin-left: 0.06em; }
+  .hero .lead { max-width: 30rem; }
+  .hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .hero__visual { position: relative; }
+  .hero__window { transform: rotate(1.2deg); }
+  .hero__window :global(.hero__window-body) { padding: 0; }
+  .hero__photo { width: 100%; aspect-ratio: 4 / 4.4; object-fit: cover; object-position: 50% 30%; }
+  .hero__contacts { list-style: none; margin: 0; padding: 0; position: absolute; left: -28px; bottom: -22px; z-index: 2; display: grid; gap: 8px; justify-items: start; }
+  .hero__contacts a {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 16px 0 8px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--line-strong); box-shadow: var(--shadow-lift);
+    text-decoration: none; font-size: 0.92rem; transition: background 0.2s, border-color 0.2s;
+  }
+  .hero__contacts a:hover { background: var(--berry); border-color: var(--berry); color: var(--lemon); }
+  .hero__contacts .ico { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--berry); color: var(--lemon); font-size: 0.85rem; }
+  .hero__contacts a:hover .ico { background: var(--lemon); color: var(--berry); }
+
+  /* folders */
+  .folders { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap); list-style: none; margin: 0; padding: 24px 0 0; }
+  .more__title { margin: var(--s-8) 0 var(--s-5); font-size: var(--fs-h3); }
+  .more { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); list-style: none; margin: 0; padding: 0; }
+  .more > li { display: flex; }
+  .more :global(.mw) { width: 100%; transition: transform var(--dur) var(--ease), border-color 0.3s; }
+  .more :global(.mw:hover) { transform: translateY(-5px); border-color: rgba(204, 73, 100, 0.5); }
+  .more :global(.mw__body) { display: grid; gap: 12px; align-content: start; }
+  .mw__tag { justify-self: start; }
+  .mw__role { margin-top: -6px; font-size: 0.88rem; color: var(--mink); }
+  .mw__text { color: var(--text-soft); font-size: 0.95rem; }
+  .more summary { cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-soft); list-style: none; }
+  .more summary::-webkit-details-marker { display: none; }
+  .more summary::after { content: ' +'; color: var(--berry); }
+  .more details[open] summary::after { content: ' –'; }
+  .more details ul { margin: 8px 0 0; padding-left: 18px; color: var(--text-soft); font-size: 0.9rem; }
+  .mw__metrics { list-style: none; margin: 4px 0 0; padding: 14px 0 0; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.85rem; }
+  .mw__metrics li::before { content: '✦ '; color: var(--berry); }
+  .more :global(.mw--accent) { background: var(--berry); border-color: var(--berry); }
+  .more :global(.mw--accent .window__bar) { background: rgba(0, 0, 0, 0.1); border-bottom-color: rgba(255, 251, 248, 0.2); color: #fffbf8; }
+  .more :global(.mw--accent) .mw__role, .more :global(.mw--accent) .mw__text, .more :global(.mw--accent) summary, .more :global(.mw--accent) details ul { color: rgba(250, 252, 208, 0.88); }
+  .more :global(.mw--accent) h3, .more :global(.mw--accent) .mw__metrics { color: var(--lemon); }
+  .more :global(.mw--accent) .mw__tag { background: rgba(250, 252, 208, 0.18); color: var(--lemon); }
+  .more :global(.mw--accent) .mw__metrics { border-top-color: rgba(250, 252, 208, 0.25); }
+  .more :global(.mw--accent) .mw__metrics li::before, .more :global(.mw--accent) summary::after { color: var(--lemon); }
+
+  /* intro */
+  .intro { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(28px, 6vw, 96px); align-items: center; }
+  .intro__media { position: relative; }
+  .intro__media :global(img) { border-radius: var(--r-md); aspect-ratio: 4 / 5; object-fit: cover; box-shadow: var(--shadow-lift); }
+  .intro__tag { position: absolute; left: -10px; bottom: 24px; padding: 6px 14px; background: var(--surface); color: var(--berry); box-shadow: var(--shadow-window); border-radius: 999px; font-size: 1.3rem; transform: rotate(-5deg); }
+  .intro__text { display: grid; gap: 20px; justify-items: start; }
+
+  /* dashboard */
+  .dash { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--gap); align-items: start; }
+  .dash__stats h2 { margin-bottom: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); list-style: none; margin: 0; padding: 0; }
+  .stat { display: grid; gap: 10px; align-content: space-between; min-height: 168px; padding: 22px; border-radius: var(--r-md); background: var(--tone); color: var(--on-tone); border: 1px solid var(--line); }
+  .stat__value { font-size: clamp(2.8rem, 4.6vw, 4.2rem); line-height: 1; }
+  .stat span { font-size: 0.95rem; line-height: 1.35; max-width: 16rem; }
+  .timeline :global(.timeline__body) { display: grid; gap: 14px; }
+  .timeline__range { font-size: 1.5rem; text-align: center; }
+  .timeline__hint { text-align: center; font-size: 0.88rem; color: var(--text-soft); }
+  .timeline__years { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .timeline__year { position: relative; min-height: 48px; border-radius: var(--r-sm); border: 1px solid var(--line); background: var(--surface-2); cursor: pointer; font-size: 1rem; transition: background 0.2s, color 0.2s, border-color 0.2s; }
+  .timeline__year:hover { border-color: var(--text); }
+  .timeline__year[aria-expanded='true'] { background: var(--berry); color: var(--lemon); border-color: var(--berry); }
+  .timeline__dot { position: absolute; top: 5px; right: 7px; font-size: 0.62rem; color: var(--mink); }
+  .timeline__year[aria-expanded='true'] .timeline__dot { color: var(--lemon); }
+  /* dropdown: collapsed until a year is picked */
+  .timeline__drop { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.45s var(--ease); }
+  .timeline__drop.is-open { grid-template-rows: 1fr; }
+  .timeline__drop-inner { overflow: hidden; }
+  .timeline__drop-head { margin: 4px 0 10px; font-size: 1.1rem; color: var(--berry); }
+  .timeline__list { list-style: none; margin: 0; padding: 0 0 4px; display: grid; gap: 10px; }
+  .timeline__list > li { display: grid; gap: 3px; padding: 14px 16px; border-radius: var(--r-sm); background: var(--bg); border: 1px solid var(--line); }
+  .timeline__list > li > span:nth-of-type(2) { color: var(--text-soft); font-size: 0.9rem; }
+  .timeline__points { margin: 6px 0 0; padding-left: 18px; font-size: 0.88rem; color: var(--text-soft); }
+  .timeline__more { justify-self: start; }
+
+  /* approach — outline numbers, as in the first portfolio */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; counter-reset: step; }
+  .steps li { padding: 28px 24px; border-radius: var(--r-md); border: 1px solid var(--line); counter-increment: step; transition: border-color 0.3s, background 0.3s; }
+  .steps li:hover { border-color: rgba(184, 64, 90, 0.5); background: var(--surface); }
+  .steps li { --step: var(--berry); }
+  .steps li:nth-child(2) { --step: var(--wine); }
+  .steps li:nth-child(3) { --step: var(--mulberry); }
+  .steps li:nth-child(4) { --step: var(--mink); }
+  .steps li::before {
+    content: '0' counter(step); display: grid; place-items: center; width: 68px; height: 68px; margin-bottom: 26px;
+    border-radius: 20px; background: var(--step); color: #fffbf8; font: 600 1.9rem/1 var(--f-label);
+    box-shadow: 0 14px 24px -16px var(--step); transition: transform 0.4s var(--ease);
+  }
+  .steps li:hover::before { transform: rotate(-6deg) scale(1.05); }
+  .arrow--down { transform: none !important; }
+  a:hover > .arrow--down { transform: translateY(3px) !important; }
+  .steps h3 { margin-bottom: 8px; font-size: 1.3rem; }
+  .steps p { color: var(--text-soft); font-size: 0.95rem; }
+
+  /* services */
+  .services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; list-style: none; margin: 0; padding: 0; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
+  .service { display: grid; gap: 10px; align-content: start; padding: 30px; background: var(--bg); transition: background 0.3s; }
+  .service:hover { background: var(--surface); }
+  .service .num { color: var(--berry); }
+  .service__task { color: var(--text-soft); }
+  .service__out { font-weight: 500; }
+
+  /* teaching */
+  .teach-grid { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 18px; }
+  .teach { margin: 0; padding: 28px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+  .teach b { display: block; font-size: clamp(2.6rem, 5vw, 4rem); line-height: 1; color: var(--berry); }
+  .teach h3 { margin: 18px 0 6px; font-size: 1.2rem; }
+  .teach p { color: var(--text-soft); font-size: 0.95rem; }
+  .teach--photo { position: relative; padding: 0; overflow: hidden; min-height: 280px; }
+  .teach--photo :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .teach--photo figcaption { position: absolute; left: 16px; right: 16px; bottom: 16px; padding: 10px 14px; border-radius: 12px; background: rgba(20, 13, 14, 0.8); backdrop-filter: blur(6px); font-size: 0.82rem; color: var(--mauve); }
+
+  /* previews */
+  .previews { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+  .preview { position: relative; display: grid; gap: 22px; align-content: start; min-height: 280px; padding: clamp(24px, 3vw, 40px); border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); text-decoration: none; transition: transform var(--dur) var(--ease), border-color 0.3s; }
+  .preview:hover { transform: translateY(-4px); border-color: rgba(204, 73, 100, 0.5); }
+  .preview h2 { max-width: 14ch; }
+  .preview--accent { background: var(--wine); color: var(--bg); border-color: var(--wine); }
+  .preview__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-width: 32rem; }
+  .preview__list li { display: grid; gap: 2px; }
+  .preview__certs { display: grid; gap: 10px; padding-top: 14px; border-top: 1px solid rgba(247, 240, 236, 0.2); }
+  .preview--accent .chip { color: var(--bg); border-color: rgba(247, 240, 236, 0.3); }
+  .preview__go { position: absolute; right: 22px; top: 22px; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--line-strong); }
+  .preview--accent .preview__go { border-color: rgba(247, 240, 236, 0.3); }
+
+  /* quotes */
+  .quotes { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); list-style: none; margin: 0; padding: 0; }
+  .quote { height: 100%; margin: 0; display: grid; gap: 22px; align-content: space-between; padding: 32px; border-radius: var(--r-lg); border: 1px solid var(--line); background: linear-gradient(160deg, var(--surface), var(--bg)); }
+  .quote blockquote { margin: 0; font: italic 400 clamp(1.15rem, 1.5vw, 1.35rem)/1.45 var(--f-display); }
+  .quote blockquote::before { content: '“'; display: block; font: 500 3.4rem/0.6 var(--f-display); color: var(--berry); margin-bottom: 12px; }
+  .quote figcaption { font: 500 var(--fs-label)/1.3 var(--f-label); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mink); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 1280px) {
+    .folders { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 40px; }
+  }
+  @media (max-width: 1024px) {
+    .hero { grid-template-columns: 1fr 0.8fr; }
+    .dash { grid-template-columns: 1fr; }
+    .more { grid-template-columns: 1fr 1fr; }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .services { grid-template-columns: repeat(2, 1fr); }
+    .teach-grid { grid-template-columns: 1fr 1fr; }
+    .teach--photo { grid-column: 1 / -1; }
+    .quotes { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; }
+    .hero__visual { order: -1; width: min(330px, 84%); justify-self: center; margin-bottom: 40px; }
+    .hero__contacts { left: 50%; transform: translateX(-50%); bottom: -40px; justify-items: center; width: max-content; max-width: 92vw; }
+    .hero__contacts a { font-size: 0.85rem; min-height: 40px; }
+    .folders { padding-top: 0; }
+    .intro { grid-template-columns: 1fr; }
+    .intro__media { width: min(360px, 88%); }
+    .previews { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .folders, .more, .steps, .services, .teach-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .stat { min-height: 140px; padding: 16px; }
+    .stat span { font-size: 0.85rem; }
+    .service { padding: 24px 20px; }
+    .hero__cta .btn { flex: 1 1 100%; }
+  }
+</style>

@@ -1,0 +1,179 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import CookieNotice from '@/components/CookieNotice.astro';
+import { alternate, useT, type Lang } from '@/i18n/ui';
+import ogImage from '@/assets/img/me/portrait.jpg';
+import '@/styles/global.css';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+}
+const { lang, title, description } = Astro.props;
+const t = useT(lang);
+const pageTitle = title ? `${title} — ${lang === 'ru' ? 'Василиса Трунова' : 'Vasilisa Trunova'}` : t('site.title');
+const desc = description ?? t('site.description');
+const path = Astro.url.pathname;
+const site = Astro.site ?? new URL('https://example.com');
+const canonical = new URL(path, site).href;
+const altRu = new URL(alternate(path, 'ru'), site).href;
+const altEn = new URL(alternate(path, 'en'), site).href;
+---
+<!doctype html>
+<html lang={lang} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="ru" href={altRu} />
+    <link rel="alternate" hreflang="en" href={altEn} />
+    <link rel="alternate" hreflang="x-default" href={altRu} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:image" content={new URL(ogImage.src, site).href} />
+    <meta property="og:locale" content={lang === 'ru' ? 'ru_RU' : 'en_US'} />
+    <meta name="theme-color" content="#140d0e" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2324191A'/%3E%3Ctext x='50%25' y='62%25' text-anchor='middle' font-family='Georgia' font-size='30' fill='%23CC4964'%3EVT%3C/text%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Onest:wght@400;500;600&family=Oswald:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap"
+    />
+    <script is:inline>document.documentElement.classList.remove('no-js');</script>
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{lang === 'ru' ? 'К содержанию' : 'Skip to content'}</a>
+    <div class="grain" aria-hidden="true"></div>
+    <Header lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+    <CookieNotice lang={lang} />
+    <!-- back to top: a small pink dinosaur that jumps up -->
+    <button class="to-top" type="button" data-to-top aria-label={t('cta.top')} title={t('cta.top')}>
+      <span class="to-top__bubble" aria-hidden="true">↑</span>
+      <svg class="to-top__dino" viewBox="0 0 72 64" aria-hidden="true">
+        <path class="dino-spikes" d="M22 27l3-6 3 6M30 24l3-6 3 6M38 24l3-6 3 6" />
+        <path class="dino-body" d="M8 46c6 1 10-1 13-5 1-9 8-16 18-16h3V14c0-6 4-10 10-10h5c6 0 10 4 10 10v5c0 3-2 5-5 5h-7v5c5 3 7 8 7 14v1c0 8-6 14-14 14H33c-4 0-8-2-11-5-5 2-11 1-14-3z" />
+        <path class="dino-belly" d="M36 44c0-5 4-9 9-9h3c2 3 3 6 3 9 0 5-4 9-9 9h-1c-3-2-5-5-5-9z" />
+        <circle class="dino-eye" cx="55" cy="12" r="2.6" />
+        <path class="dino-smile" d="M58 19c2 0 4-1 5-2" />
+        <circle class="dino-cheek" cx="60" cy="15" r="2" />
+        <path class="dino-leg" d="M30 54v6h6v-5M44 55v5h6v-6" />
+        <path class="dino-arm" d="M50 31l4 3" />
+      </svg>
+    </button>
+
+    <style>
+      .to-top {
+        position: fixed; right: 18px; bottom: 16px; z-index: 40; width: 76px; height: 76px; padding: 0;
+        border: 0; background: none; cursor: pointer;
+        opacity: 0; visibility: hidden; transform: translateY(16px);
+        transition: opacity 0.3s, transform 0.35s var(--ease), visibility 0.3s;
+      }
+      .to-top.is-on { opacity: 1; visibility: visible; transform: none; }
+      .to-top:focus-visible { outline: 2px solid var(--berry); outline-offset: 2px; border-radius: 16px; }
+      .to-top__dino { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 10px 12px rgba(184, 64, 90, 0.35)); transition: transform 0.35s var(--ease); }
+      .dino-body { fill: #f08aa6; }
+      .dino-belly { fill: #fbd3de; }
+      .dino-spikes { fill: #d9607f; }
+      .dino-eye { fill: #24191a; }
+      .dino-cheek { fill: #ff6f91; opacity: 0.55; }
+      .dino-smile, .dino-arm { fill: none; stroke: #24191a; stroke-width: 1.8; stroke-linecap: round; }
+      .dino-leg { fill: #f08aa6; stroke: #d9607f; stroke-width: 1.4; stroke-linejoin: round; }
+      .to-top__bubble {
+        position: absolute; left: 4px; top: -6px; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+        background: var(--surface); border: 1px solid var(--line-strong); color: var(--berry); font-weight: 700; font-size: 0.95rem;
+        box-shadow: var(--shadow-window); transition: transform 0.35s var(--ease);
+      }
+      .to-top:hover .to-top__dino, .to-top:focus-visible .to-top__dino { animation: dino-hop 0.6s var(--ease); }
+      .to-top:hover .to-top__bubble { transform: translateY(-6px); }
+      @keyframes dino-hop { 30% { transform: translateY(-12px) rotate(-4deg); } 60% { transform: translateY(0) rotate(2deg); } 80% { transform: translateY(-4px); } }
+      .to-top.is-jumping .to-top__dino { animation: dino-launch 0.5s var(--ease); }
+      @keyframes dino-launch { 40% { transform: translateY(-28px) scale(1.05); } }
+      @media (max-width: 560px) { .to-top { width: 60px; height: 60px; right: 12px; bottom: 12px; } }
+      @media (prefers-reduced-motion: reduce) { .to-top__dino, .to-top.is-jumping .to-top__dino { animation: none !important; } }
+    </style>
+
+    <script>
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function setupReveal() {
+        const items = document.querySelectorAll<HTMLElement>('.reveal:not(.is-in)');
+        if (reduced) { items.forEach((el) => el.classList.add('is-in')); return; }
+        // scroll check rather than IntersectionObserver: also works in embedded/background views
+        const check = () => {
+          const limit = innerHeight * 0.92;
+          document.querySelectorAll<HTMLElement>('.reveal:not(.is-in)').forEach((el) => {
+            const r = el.getBoundingClientRect();
+            if (r.top < limit && r.bottom > 0) {
+              const i = el.parentElement ? [...el.parentElement.children].indexOf(el) : 0;
+              el.style.transitionDelay = `${Math.min(i, 6) * 60}ms`;
+              el.classList.add('is-in');
+              el.querySelectorAll<HTMLElement>('[data-count]').forEach(count);
+            }
+          });
+        };
+        check();
+        return check;
+      }
+
+      function count(el: HTMLElement) {
+        if (el.dataset.done) return;
+        el.dataset.done = '1';
+        const end = Number(el.dataset.count);
+        const suffix = el.dataset.suffix ?? '';
+        if (reduced || !end) return;
+        const t0 = Date.now();
+        const id = setInterval(() => {
+          const p = Math.min((Date.now() - t0) / 1300, 1);
+          el.textContent = Math.round(end * (1 - Math.pow(1 - p, 3))) + suffix;
+          if (p >= 1) clearInterval(id);
+        }, 30);
+      }
+
+      function setupHeader() {
+        const header = document.querySelector('[data-header]');
+        const toTop = document.querySelector<HTMLButtonElement>('[data-to-top]');
+        const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+        const nav = document.querySelector<HTMLElement>('[data-nav]');
+        const label = burger?.querySelector<HTMLElement>('.visually-hidden');
+        const setOpen = (open: boolean) => {
+          burger?.setAttribute('aria-expanded', String(open));
+          nav?.classList.toggle('is-open', open);
+          if (label) label.textContent = (open ? label.dataset.closeLabel : label.dataset.openLabel) ?? '';
+        };
+        burger?.addEventListener('click', () => setOpen(burger.getAttribute('aria-expanded') !== 'true'));
+        nav?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') setOpen(false); });
+        toTop?.addEventListener('click', () => {
+          toTop.classList.remove('is-jumping'); void toTop.offsetWidth; toTop.classList.add('is-jumping');
+          scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+        });
+        return () => {
+          header?.classList.toggle('is-scrolled', scrollY > 8);
+          toTop?.classList.toggle('is-on', scrollY > 500);
+        };
+      }
+
+      let onScroll: (() => void) | undefined;
+      document.addEventListener('astro:page-load', () => {
+        const reveal = setupReveal();
+        const headerScroll = setupHeader();
+        if (onScroll) removeEventListener('scroll', onScroll);
+        onScroll = () => { reveal?.(); headerScroll(); };
+        addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      });
+    </script>
+  </body>
+</html>

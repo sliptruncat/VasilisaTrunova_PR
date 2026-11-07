@@ -1,0 +1,48 @@
+---
+import type { FolderTone } from '@/data/projects';
+
+interface Props {
+  tone: FolderTone;
+  /** Short text printed on the paper sheet that peeks out on hover. */
+  sheet?: string;
+  class?: string;
+}
+const { tone, sheet, class: cls } = Astro.props;
+const id = `f${Math.random().toString(36).slice(2, 8)}`;
+---
+<svg class:list={['folder', `tone-${tone}`, cls]} viewBox="0 0 120 96" aria-hidden="true">
+  <defs>
+    <linearGradient id={`${id}-front`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--tone-2)" />
+      <stop offset="1" stop-color="var(--tone)" />
+    </linearGradient>
+  </defs>
+  <path class="folder__back" d="M6 15a7 7 0 0 1 7-7h25.5a5 5 0 0 1 3.6 1.5l6.4 6.5H107a7 7 0 0 1 7 7v57a7 7 0 0 1-7 7H13a7 7 0 0 1-7-7Z" />
+  <g class="folder__sheet">
+    <rect x="16" y="19" width="88" height="54" rx="3" />
+    {sheet && <text x="24" y="34">{sheet}</text>}
+    <path d="M24 44h56M24 51h44M24 58h50" />
+  </g>
+  <g class="folder__front">
+    <path d="M4 33a7 7 0 0 1 7-7h98a7 7 0 0 1 7 7.4l-2.6 48A7 7 0 0 1 106.4 88H13.6a7 7 0 0 1-7-6.6L4 33.4Z" fill={`url(#${id}-front)`} />
+    <path class="folder__shine" d="M11 29.5h98" />
+  </g>
+</svg>
+
+<style>
+  .folder { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 14px 16px rgba(36, 25, 26, 0.25)); }
+  .folder__back { fill: color-mix(in srgb, var(--tone) 78%, #24191a); }
+  .folder__sheet { transition: transform 0.5s var(--ease); transform-origin: 60px 70px; }
+  .folder__sheet rect { fill: #fffaf3; stroke: rgba(36, 25, 26, 0.12); }
+  .folder__sheet path { stroke: rgba(36, 25, 26, 0.18); stroke-width: 2; stroke-linecap: round; fill: none; }
+  .folder__sheet text { font: 600 8px var(--f-label); letter-spacing: 0.06em; fill: var(--black); }
+  .folder__front { transform-origin: 60px 88px; transition: transform 0.5s var(--ease); }
+  .folder__shine { stroke: rgba(255, 255, 255, 0.55); stroke-width: 1.4; stroke-linecap: round; }
+
+  :global(a:hover) > .folder .folder__front,
+  :global(a:focus-visible) > .folder .folder__front,
+  :global(.folder-hover:hover) .folder__front { transform: perspective(240px) rotateX(-22deg); }
+  :global(a:hover) > .folder .folder__sheet,
+  :global(a:focus-visible) > .folder .folder__sheet,
+  :global(.folder-hover:hover) .folder__sheet { transform: translateY(-9px) rotate(-2deg); }
+</style>

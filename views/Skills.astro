@@ -1,0 +1,85 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import { skillGroups } from '@/data/skills';
+import { tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+const icons: Record<string, string> = { megaphone: '◉', chart: '▲', screen: '▣', palette: '✦', ticket: '✳', search: '◎', board: '▤' };
+const languages = ru
+  ? [['Русский', 'родной'], ['Английский', 'C1'], ['Немецкий', 'B1–B2'], ['Итальянский', 'B1']]
+  : [['Russian', 'native'], ['English', 'C1'], ['German', 'B1–B2'], ['Italian', 'B1']];
+const metrics = ['ER', 'CPM', 'CPC', 'CTR', 'CPA', 'DRR', ru ? 'охват' : 'reach', ru ? 'конверсия' : 'conversion', ru ? 'тональность' : 'sentiment'];
+---
+<Base lang={lang} title={ru ? 'Навыки' : 'Skills'} description={ru ? 'Навыки и инструменты Василисы Труновой: PR, маркетинг, цифровое продвижение, креатив, ивенты, аналитика, управление проектами.' : 'Vasilisa Trunova’s skills and tools: PR, marketing, digital, creative, events, analytics, project management.'}>
+  <PageHero label="Skills" title={ru ? 'Библиотека навыков' : 'Skills library'} lead={ru ? 'Реальные компетенции и инструменты, с которыми я работаю, — без процентов и шкал.' : 'Real competencies and the tools I use — no percentages or bars.'} />
+
+  <section class="container section">
+    <div class="skill-filter reveal" role="group" aria-label={ru ? 'Категории' : 'Categories'} data-skill-filter>
+      <button type="button" class="chip" aria-pressed="true" data-k="all">{ru ? 'Все' : 'All'}</button>
+      {skillGroups.map((g) => <button type="button" class="chip" aria-pressed="false" data-k={g.key}>{tr(g.title, lang)}</button>)}
+    </div>
+    <ul class="skills">
+      {skillGroups.map((g, i) => (
+        <li class:list={['skill', `tone-${g.tone}`, i === 0 && 'skill--wide', 'reveal']} data-key={g.key}>
+          <span class="skill__icon" aria-hidden="true">{icons[g.icon] ?? '✦'}</span>
+          <h2>{tr(g.title, lang)}</h2>
+          <ul class="skill__items">{tr(g.items, lang).map((x) => <li>{x}</li>)}</ul>
+          {g.tools.length > 0 && <ul class="chips skill__tools">{g.tools.map((t) => <li class="chip">{t}</li>)}</ul>}
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="container section skills-extra">
+    <div class="window reveal">
+      <div class="window__bar"><span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span><span>metrics.txt</span></div>
+      <div class="window__body">
+        <h2>{ru ? 'Метрики, с которыми работаю' : 'Metrics I work with'}</h2>
+        <ul class="chips">{metrics.map((m) => <li class="chip">{m}</li>)}</ul>
+      </div>
+    </div>
+    <div class="window reveal">
+      <div class="window__bar"><span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span><span>languages.txt</span></div>
+      <div class="window__body">
+        <h2>{ru ? 'Языки' : 'Languages'}</h2>
+        <ul class="langs">{languages.map(([l, v]) => <li><span>{l}</span><b class="num">{v}</b></li>)}</ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const btns = [...document.querySelectorAll<HTMLButtonElement>('[data-skill-filter] [data-k]')];
+    const cards = [...document.querySelectorAll<HTMLElement>('.skill')];
+    btns.forEach((b) => b.addEventListener('click', () => {
+      const k = b.dataset.k;
+      btns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      cards.forEach((c) => { c.hidden = k !== 'all' && c.dataset.key !== k; });
+    }));
+  });
+</script>
+
+<style>
+  .skill-filter { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .skill-filter .chip { min-height: 40px; padding: 0 16px; }
+  .skills { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .skill { display: grid; gap: 16px; align-content: start; padding: 28px; border-radius: var(--r-lg); background: var(--tone); color: var(--on-tone); border: 1px solid var(--line); transition: transform var(--dur) var(--ease); }
+  .skill:hover { transform: translateY(-4px); }
+  .skill--wide { grid-column: span 2; }
+  .skill__icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; background: rgba(255, 251, 248, 0.3); font-size: 1.2rem; }
+  .skill h2 { font-size: clamp(1.5rem, 2.2vw, 2rem); }
+  .skill__items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .skill__items li::before { content: '— '; opacity: 0.6; }
+  .skill__tools .chip { color: inherit; border-color: color-mix(in srgb, var(--on-tone) 30%, transparent); background: rgba(255, 251, 248, 0.25); }
+  .skills-extra { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+  .skills-extra h2 { font-size: 1.6rem; margin-bottom: 16px; }
+  .langs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .langs li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .langs b { color: var(--berry); }
+  @media (max-width: 1024px) { .skills { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 680px) { .skills, .skills-extra { grid-template-columns: 1fr; } .skill--wide { grid-column: auto; } }
+</style>

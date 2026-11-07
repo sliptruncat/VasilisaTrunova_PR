@@ -1,0 +1,171 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import Window from '@/components/Window.astro';
+import { href, tr, type Lang } from '@/i18n/ui';
+import { approach, contacts, stats } from '@/data/site';
+import { skillGroups } from '@/data/skills';
+import { degrees } from '@/data/education';
+import portrait from '@/assets/img/me/portrait.jpg';
+import car from '@/assets/img/me/car-smile.jpg';
+import neon from '@/assets/img/me/event-neon.jpg';
+import testdrive from '@/assets/img/me/testdrive.jpg';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+const cvUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${contacts.cv}`;
+
+/** Text from «Professional profile & FAQ». */
+const c = {
+  title: ru ? 'Обо мне' : 'About me',
+  lead: ru
+    ? 'Специалист по стратегическим коммуникациям и продвижению. Исследую бизнес-среду, аудитории и конкурентное поле, чтобы разрабатывать обоснованные стратегии и кампании.'
+    : 'A strategic communications and promotion specialist. I research the business environment, audiences and competitors to build well-grounded strategies and campaigns.',
+  bio: ru
+    ? [
+        'Я специалист по PR и маркетингу с опытом больше шести лет. Работаю со стратегией и реализацией коммуникационных проектов: исследую рынок и аудитории, провожу аудиты, формирую позиционирование, разрабатываю стратегии продвижения, выстраиваю работу со СМИ и инфлюенсерами, создаю контент и визуальные материалы, запускаю рекламу и анализирую результаты.',
+        'Соединяю аналитику, работу с каналами и креативную реализацию: от исследования и гипотез до запуска и оценки результатов. Могу вести проект на всех этапах или подключиться к отдельным задачам.',
+      ]
+    : [
+        'I am a PR and marketing specialist with more than six years of experience. I work on both strategy and delivery: I research markets and audiences, run audits, shape positioning, build promotion strategies, work with media and influencers, create content and visuals, launch ads and analyse results.',
+        'I combine analytics, channel work and creative execution — from research and hypotheses to launch and evaluation. I can run a project end to end or join for specific tasks.',
+      ],
+  background: ru ? 'Путь в профессии' : 'Career background',
+  backgroundText: ru
+    ? 'Начинала с мероприятий и SMM в культурном пространстве «Кофепью» в 2019 году, потом были студенческие медиа РАНХиГС, ESG-стартап VECO, международное PR-агентство ABLAB Pro, проекты для Газпромбанка, ИД «Дискавери», СпецТрансСтроя и Main Strings Orchestra. С 2024 года веду частную практику: аудиты брендов и стратегии.'
+    : 'I started with events and social media at the Kofepyu cultural space in 2019, then RANEPA student media, the ESG startup VECO, the international PR agency ABLAB Pro, and projects for Gazprombank, Discovery Publishing, SpetsTransStroy and Main Strings Orchestra. Since 2024 I have run an independent practice: brand audits and strategy.',
+  philosophy: ru ? 'Как я работаю' : 'Working philosophy',
+  management: ru ? 'Управление' : 'Management',
+  managementText: ru
+    ? 'Руководила коммуникационными направлениями в четырёх проектах, управляла командами до семи человек. Распределяю задачи, координирую процессы и подрядчиков, контролирую сроки и отвечаю за общий результат.'
+    : 'I have headed communications in four projects and led teams of up to seven. I assign tasks, coordinate processes and contractors, keep to deadlines and own the overall result.',
+  freelance: ru ? 'Частная практика' : 'Independent practice',
+  freelanceText: ru
+    ? 'С 2024 года: 30+ аудитов коммуникаций брендов одежды, beauty, HoReCa, образовательных и медиапроектов, стратегии продвижения и личного бренда. Подключаюсь как самостоятельный специалист, руководитель направления или консультант.'
+    : 'Since 2024: 30+ communication audits for fashion, beauty, hospitality, education and media brands, promotion and personal-brand strategies. I join as an independent specialist, head of a function or consultant.',
+  expertise: ru ? 'Области экспертизы' : 'Areas of expertise',
+  education: ru ? 'Образование' : 'Education',
+  cv: ru ? 'Резюме PDF' : 'CV (PDF)',
+  work: ru ? 'Смотреть кейсы' : 'View work',
+};
+---
+<Base lang={lang} title={c.title} description={c.lead}>
+  <PageHero label="About" title={c.title} lead={c.lead}>
+    <div class="about-cta reveal">
+      <a class="btn" href={href('work', lang)}>{c.work} <span class="arrow">↗</span></a>
+      <a class="btn btn--ghost" href={cvUrl} download>{c.cv} ↓</a>
+    </div>
+  </PageHero>
+
+  <section class="container section about-bio">
+    <div class="about-bio__photos reveal">
+      <Window title="vasilisa.jpg" class="about-win" bodyClass="about-win__body">
+        <Image src={portrait} alt={ru ? 'Портрет Василисы Труновой' : 'Portrait of Vasilisa Trunova'} widths={[400, 700]} sizes="(max-width: 860px) 80vw, 30vw" />
+      </Window>
+      <Image class="about-bio__small" src={car} alt={ru ? 'Василиса на тест-драйве' : 'Vasilisa at a test drive'} widths={[300, 500]} sizes="200px" loading="lazy" />
+    </div>
+    <div class="about-bio__text">
+      {c.bio.map((p, i) => <p class:list={['reveal', i === 0 && 'lead']}>{p}</p>)}
+      <ul class="about-stats">
+        {stats.map((s) => <li class="reveal"><b class="display">{s.value}{s.suffix}</b><span>{tr(s.label, lang)}</span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  <section class="container section about-cols">
+    <div class="about-col reveal">
+      <h2>{c.background}</h2>
+      <p>{c.backgroundText}</p>
+      <a class="link" href={href('experience', lang)}>{ru ? 'Весь опыт' : 'Full experience'} <span class="arrow">↗</span></a>
+    </div>
+    <div class="about-col reveal">
+      <h2>{c.management}</h2>
+      <p>{c.managementText}</p>
+    </div>
+    <div class="about-col reveal">
+      <h2>{c.freelance}</h2>
+      <p>{c.freelanceText}</p>
+    </div>
+  </section>
+
+  <section class="container section">
+    <h2 class="reveal about-h">{c.philosophy}</h2>
+    <ol class="steps">{approach.steps.map((s) => <li class="reveal"><h3>{tr(s.title, lang)}</h3><p>{tr(s.text, lang)}</p></li>)}</ol>
+  </section>
+
+  <section class="container section about-exp">
+    <div>
+      <h2 class="reveal about-h">{c.expertise}</h2>
+      <ul class="exp-list">
+        {skillGroups.map((g) => <li class:list={['reveal', `tone-${g.tone}`]}><strong>{tr(g.title, lang)}</strong><span>{tr(g.items, lang).join(' · ')}</span></li>)}
+      </ul>
+      <a class="link reveal" href={href('skills', lang)}>{ru ? 'Навыки и инструменты' : 'Skills & tools'} <span class="arrow">↗</span></a>
+    </div>
+    <div class="about-exp__media reveal">
+      <Image src={neon} alt={ru ? 'Василиса на мероприятии' : 'Vasilisa at an event'} widths={[400, 700]} sizes="(max-width: 860px) 90vw, 36vw" loading="lazy" />
+      <Image src={testdrive} alt={ru ? 'Тест-драйв премии «Топ-5 Авто»' : 'Top-5 Auto award test drive'} widths={[400, 700]} sizes="(max-width: 860px) 90vw, 36vw" loading="lazy" />
+    </div>
+  </section>
+
+  <section class="container section">
+    <h2 class="reveal about-h">{c.education}</h2>
+    <ul class="edu-mini">
+      {degrees.map((d) => <li class="reveal"><span class="num">{tr(d.period, lang)}</span><strong>{tr(d.title, lang)}</strong><span>{tr(d.detail, lang)}</span></li>)}
+    </ul>
+    <a class="link reveal" href={href('education', lang)}>{ru ? 'Образование и награды' : 'Education & awards'} <span class="arrow">↗</span></a>
+  </section>
+</Base>
+
+<style>
+  .about-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .about-bio { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(28px, 6vw, 88px); align-items: start; }
+  .about-bio__photos { position: relative; padding-bottom: 60px; }
+  .about-win { transform: rotate(-1.5deg); }
+  .about-win :global(.about-win__body) { padding: 0; }
+  .about-win :global(img) { width: 100%; aspect-ratio: 4 / 4.6; object-fit: cover; object-position: 50% 30%; }
+  .about-bio__small { position: absolute; right: -16px; bottom: 0; width: 44%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: var(--r-md); border: 6px solid var(--surface); box-shadow: var(--shadow-lift); transform: rotate(4deg); }
+  .about-bio__text { display: grid; gap: 18px; }
+  .about-bio__text p:not(.lead) { color: var(--text-soft); }
+  .about-stats { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--gap); }
+  .about-stats li { display: grid; gap: 6px; padding: 18px 0; border-top: 1px solid var(--line); }
+  .about-stats b { font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; color: var(--berry); }
+  .about-stats span { font-size: 0.92rem; color: var(--text-soft); }
+
+  .about-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--gap); }
+  .about-col { display: grid; gap: 14px; align-content: start; padding: 28px; border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--line); }
+  .about-col h2 { font-size: clamp(1.5rem, 2.2vw, 2rem); }
+  .about-col p { color: var(--text-soft); }
+  .about-h { margin-bottom: 26px; }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; counter-reset: step; }
+  .steps li { --step: var(--berry); padding: 26px 22px; border-radius: var(--r-md); border: 1px solid var(--line); counter-increment: step; }
+  .steps li:nth-child(2) { --step: var(--wine); }
+  .steps li:nth-child(3) { --step: var(--mulberry); }
+  .steps li:nth-child(4) { --step: var(--mink); }
+  .steps li::before { content: '0' counter(step); display: grid; place-items: center; width: 60px; height: 60px; margin-bottom: 22px; border-radius: 18px; background: var(--step); color: #fffbf8; font: 600 1.6rem/1 var(--f-label); }
+  .steps h3 { margin-bottom: 8px; font-size: 1.25rem; }
+  .steps p { color: var(--text-soft); font-size: 0.95rem; }
+
+  .about-exp { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
+  .exp-list { list-style: none; margin: 0 0 22px; padding: 0; display: grid; gap: 10px; }
+  .exp-list li { display: grid; gap: 4px; padding: 16px 18px; border-radius: var(--r-md); background: var(--tone); color: var(--on-tone); border: 1px solid var(--line); }
+  .exp-list span { font-size: 0.9rem; opacity: 0.85; }
+  .about-exp__media { display: grid; gap: var(--gap); }
+  .about-exp__media :global(img) { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: var(--r-md); }
+
+  .edu-mini { list-style: none; margin: 0 0 22px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); }
+  .edu-mini li { display: grid; gap: 6px; padding: 22px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); }
+  .edu-mini .num { color: var(--berry); }
+  .edu-mini strong { font: 500 1.3rem/1.2 var(--f-display); }
+  .edu-mini span:last-child { color: var(--text-soft); font-size: 0.92rem; }
+
+  @media (max-width: 1024px) { .about-cols { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 860px) {
+    .about-bio, .about-exp { grid-template-columns: 1fr; }
+    .about-bio__photos { width: min(380px, 86%); }
+    .edu-mini { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) { .steps, .about-stats { grid-template-columns: 1fr; } .about-bio__small { right: -6px; } }
+</style>

@@ -1,0 +1,123 @@
+---
+import Base from '@/layouts/Base.astro';
+import PageHero from '@/components/PageHero.astro';
+import { roles, timelineYears } from '@/data/experience';
+import { href, tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ru = lang === 'ru';
+const first = timelineYears[0];
+const kind = {
+  work: { ru: 'Работа', en: 'Work', tone: 'berry' },
+  project: { ru: 'Проект', en: 'Project', tone: 'mulberry' },
+  education: { ru: 'Учёба', en: 'Education', tone: 'lemon' },
+  teaching: { ru: 'Преподавание', en: 'Teaching', tone: 'mink' },
+} as const;
+const sorted = [...roles].sort((a, b) => Math.max(...b.years) - Math.max(...a.years) || Math.min(...b.years) - Math.min(...a.years));
+---
+<Base lang={lang} title={ru ? 'Опыт' : 'Experience'} description={ru ? 'Опыт Василисы Труновой с 2019 года: работа, проекты, учёба и преподавание.' : 'Vasilisa Trunova’s experience since 2019: work, projects, education and teaching.'}>
+  <PageHero label="Experience" title={ru ? 'Опыт' : 'Experience'} lead={ru ? 'Календарь с 2019 года: работа, проекты, учёба и преподавание. Выберите год или нажмите на строку, чтобы увидеть подробности.' : 'A calendar since 2019: work, projects, education and teaching. Pick a year or click a row for details.'} />
+
+  <section class="container section cal-wrap">
+    <div class="cal-legend reveal">
+      {Object.values(kind).map((k) => <span class:list={['legend', `tone-${k.tone}`]}><i></i>{ru ? k.ru : k.en}</span>)}
+    </div>
+    <div class="cal-years reveal" role="group" aria-label={ru ? 'Фильтр по году' : 'Filter by year'} data-cal-years>
+      <button type="button" class="chip" aria-pressed="true" data-y="all">{ru ? 'Все годы' : 'All years'}</button>
+      {timelineYears.map((y) => <button type="button" class="chip num" aria-pressed="false" data-y={y}>{y}</button>)}
+    </div>
+
+    <div class="cal reveal" style={`--cols:${timelineYears.length}`}>
+      <div class="cal__head" aria-hidden="true">
+        <span></span>
+        {timelineYears.map((y) => <span class="num" data-col={y}>{y}</span>)}
+      </div>
+      <ul class="cal__rows">
+        {sorted.map((r, i) => {
+          const s = Math.min(...r.years) - first + 2;
+          const e = Math.max(...r.years) - first + 3;
+          const k = kind[r.kind];
+          return (
+            <li class="cal__row" data-years={r.years.join(',')}>
+              <button type="button" class="cal__btn" aria-expanded="false" aria-controls={`role-${i}`}>
+                <span class="cal__label"><strong>{tr(r.org, lang)}</strong><span>{tr(r.role, lang)}</span></span>
+                <span class:list={['cal__bar', `tone-${k.tone}`]} style={`grid-column:${s} / ${e}`}><span>{tr(r.period, lang)}</span></span>
+              </button>
+              <div class="cal__detail" id={`role-${i}`} hidden>
+                <span class="label">{ru ? k.ru : k.en} · {tr(r.period, lang)}</span>
+                <ul>{tr(r.points, lang).map((p) => <li>{p}</li>)}</ul>
+                {r.case && <a class="link" href={href(`work/${r.case}`, lang)}>{ru ? 'Открыть кейс' : 'Open case'} <span class="arrow">↗</span></a>}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+</Base>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const yearBtns = [...document.querySelectorAll<HTMLButtonElement>('[data-cal-years] [data-y]')];
+    const rows = [...document.querySelectorAll<HTMLElement>('.cal__row')];
+    const cols = [...document.querySelectorAll<HTMLElement>('[data-col]')];
+    if (!rows.length) return;
+    yearBtns.forEach((b) => b.addEventListener('click', () => {
+      const y = b.dataset.y ?? 'all';
+      yearBtns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+      rows.forEach((r) => { r.hidden = y !== 'all' && !(r.dataset.years ?? '').split(',').includes(y); });
+      cols.forEach((c) => c.classList.toggle('is-on', c.dataset.col === y));
+    }));
+    rows.forEach((r) => {
+      const btn = r.querySelector<HTMLButtonElement>('.cal__btn');
+      const det = r.querySelector<HTMLElement>('.cal__detail');
+      btn?.addEventListener('click', () => {
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', String(open));
+        if (det) det.hidden = !open;
+      });
+    });
+  });
+</script>
+
+<style>
+  .cal-wrap { padding-top: 40px; }
+  .cal-legend { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 16px; font-size: 0.88rem; color: var(--text-soft); }
+  .legend { display: inline-flex; align-items: center; gap: 8px; }
+  .legend i { width: 14px; height: 14px; border-radius: 4px; background: var(--tone); border: 1px solid var(--line); }
+  .cal-years { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+  .cal-years .chip { min-height: 40px; padding: 0 16px; }
+
+  .cal { --label: 300px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); overflow: hidden; }
+  .cal__head, .cal__btn { display: grid; grid-template-columns: var(--label) repeat(var(--cols), minmax(0, 1fr)); align-items: center; }
+  .cal__head { padding: 14px 18px; background: var(--surface-2); border-bottom: 1px solid var(--line); font-size: 0.9rem; }
+  .cal__head .num { text-align: center; color: var(--text-soft); border-radius: 8px; padding: 4px 0; transition: background 0.2s, color 0.2s; }
+  .cal__head .num.is-on { background: var(--berry); color: #fffbf8; }
+  .cal__rows { list-style: none; margin: 0; padding: 0; }
+  .cal__row { border-bottom: 1px solid var(--line); background-image: linear-gradient(90deg, transparent var(--label), transparent); }
+  .cal__row:last-child { border-bottom: 0; }
+  .cal__btn { all: unset; box-sizing: border-box; display: grid; grid-template-columns: var(--label) repeat(var(--cols), minmax(0, 1fr)); align-items: center; width: 100%; padding: 14px 18px; cursor: pointer; transition: background 0.2s; }
+  .cal__btn:hover, .cal__btn[aria-expanded='true'] { background: rgba(184, 64, 90, 0.05); }
+  .cal__btn:focus-visible { outline: 2px solid var(--berry); outline-offset: -2px; }
+  .cal__label { grid-column: 1; display: grid; gap: 2px; padding-right: 16px; }
+  .cal__label strong { font-weight: 600; font-size: 0.95rem; }
+  .cal__label span { font-size: 0.84rem; color: var(--text-soft); }
+  .cal__bar { grid-row: 1; display: flex; align-items: center; min-height: 34px; padding: 0 12px; border-radius: 999px; background: var(--tone); color: var(--on-tone); font-size: 0.78rem; white-space: nowrap; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(36, 25, 26, 0.08); transition: transform 0.3s var(--ease); }
+  .cal__btn:hover .cal__bar { transform: scaleY(1.08); }
+  .cal__bar span { overflow: hidden; text-overflow: ellipsis; }
+  .cal__detail { display: grid; gap: 10px; padding: 0 18px 20px calc(var(--label) + 18px); }
+  .cal__detail ul { margin: 0; padding-left: 18px; color: var(--text-soft); }
+
+  @media (max-width: 960px) {
+    .cal { --label: 200px; }
+    .cal__bar span { display: none; }
+  }
+  @media (max-width: 680px) {
+    .cal__head { display: none; }
+    .cal__btn { grid-template-columns: 1fr; gap: 10px; }
+    .cal__bar { grid-column: 1 !important; grid-row: 2; justify-self: start; }
+    .cal__bar span { display: inline; }
+    .cal__detail { padding: 0 18px 20px; }
+  }
+</style>
