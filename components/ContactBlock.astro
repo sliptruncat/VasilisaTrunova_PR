@@ -1,6 +1,6 @@
 ---
 import { contacts } from '@/data/site';
-import { tr, type Lang } from '@/i18n/ui';
+import { href, tr, type Lang } from '@/i18n/ui';
 
 interface Props { lang: Lang; asPage?: boolean }
 const { lang, asPage = false } = Astro.props;
@@ -22,12 +22,13 @@ const c = {
     ? { ru: 'Заявка придёт мне на почту и используется только для ответа вам.', en: 'Your message comes to my inbox and is used only to reply to you.' }
     : { ru: 'Данные уходят только мне и нигде не хранятся.', en: 'Your details go only to me and are not stored anywhere.' },
   required: { ru: 'Заполните это поле', en: 'Please fill in this field' },
+  consentRequired: { ru: 'Без согласия я не смогу получить заявку', en: 'I can’t receive the message without your consent' },
   sent: { ru: 'Готово! Я скоро напишу вам.', en: 'Done! I’ll get back to you soon.' },
   copied: { ru: 'Текст заявки скопирован. Отправьте его в открывшемся чате.', en: 'Your message is copied. Paste it into the chat that just opened.' },
   error: { ru: 'Не получилось отправить. Напишите мне напрямую: @sliptruncat', en: 'Couldn’t send. Message me directly: @sliptruncat' },
   msgTitle: { ru: 'Заявка с сайта', en: 'Website enquiry' },
 };
-const msg = { required: tr(c.required, lang), sent: tr(c.sent, lang), copied: tr(c.copied, lang), error: tr(c.error, lang), title: tr(c.msgTitle, lang), name: tr(c.name, lang), contact: tr(c.contact, lang), company: tr(c.company, lang), message: tr(c.message, lang) };
+const msg = { required: tr(c.required, lang), consentRequired: tr(c.consentRequired, lang), sent: tr(c.sent, lang), copied: tr(c.copied, lang), error: tr(c.error, lang), title: tr(c.msgTitle, lang), name: tr(c.name, lang), contact: tr(c.contact, lang), company: tr(c.company, lang), message: tr(c.message, lang) };
 ---
 <section class="container section contact" id="contact">
   <div class="contact__intro">
@@ -49,6 +50,14 @@ const msg = { required: tr(c.required, lang), sent: tr(c.sent, lang), copied: tr
       <label class="field"><span>{tr(c.contact, lang)}</span><input name="contact" type="text" autocomplete="email" required placeholder="@username" /></label>
       <label class="field"><span>{tr(c.company, lang)}</span><input name="company" type="text" autocomplete="organization" /></label>
       <label class="field"><span>{tr(c.message, lang)}</span><textarea name="message" rows="4" required placeholder={tr(c.messagePh, lang)}></textarea></label>
+      <label class="consent">
+        <input name="consent" type="checkbox" value="yes" required />
+        <span>
+          {lang === 'ru'
+            ? <>Даю <a href={href('consent', lang)} target="_blank">согласие на обработку персональных данных</a> и подтверждаю, что ознакомился(ась) с <a href={href('privacy', lang)} target="_blank">политикой конфиденциальности</a></>
+            : <>I give <a href={href('consent', lang)} target="_blank">consent to personal data processing</a> and confirm that I have read the <a href={href('privacy', lang)} target="_blank">privacy policy</a></>}
+        </span>
+      </label>
       <input class="visually-hidden" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
       <button class="btn btn--wide" type="submit">{tr(c.submit, lang)} <span class="arrow">↗</span></button>
       <p class="contact__hint">{tr(c.hint, lang)}</p>
@@ -84,6 +93,18 @@ const msg = { required: tr(c.required, lang), sent: tr(c.sent, lang), copied: tr
           field.append(err);
         }
       });
+      const consentBox = form.elements.namedItem('consent') as HTMLInputElement;
+      const consentLabel = consentBox.closest('.consent')!;
+      consentLabel.querySelector('.field__error')?.remove();
+      consentLabel.classList.toggle('is-invalid', !consentBox.checked);
+      consentBox.setAttribute('aria-invalid', String(!consentBox.checked));
+      if (!consentBox.checked) {
+        ok = false;
+        const err = document.createElement('span');
+        err.className = 'field__error';
+        err.textContent = m.consentRequired;
+        consentLabel.append(err);
+      }
       if (!ok) { (form.querySelector('[aria-invalid="true"]') as HTMLElement | null)?.focus(); return; }
 
       const text = [m.title, `${m.name}: ${data.name}`, `${m.contact}: ${data.contact}`, data.company ? `${m.company}: ${data.company}` : '', `${m.message}: ${data.message}`].filter(Boolean).join('\n');
@@ -124,6 +145,10 @@ const msg = { required: tr(c.required, lang), sent: tr(c.sent, lang), copied: tr
   .dl { font-family: var(--f-body); font-size: 0.9em; }
   .contact__form { display: grid; gap: 16px; padding: clamp(20px, 3vw, 32px); }
   .contact__hint { font-size: 0.8rem; color: var(--text-mute); }
+  .consent { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; font-size: 0.85rem; color: var(--text-soft); cursor: pointer; }
+  .consent input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--berry); }
+  .consent a { color: var(--berry); }
+  .consent .field__error { grid-column: 2; }
   .contact__status { font-size: 0.92rem; color: var(--berry); min-height: 1.2em; }
   @media (max-width: 860px) { .contact { grid-template-columns: 1fr; } }
 </style>
