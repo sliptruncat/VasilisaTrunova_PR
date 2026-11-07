@@ -1,0 +1,154 @@
+---
+import { contacts } from '@/data/site';
+import { href, tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang; asPage?: boolean }
+const { lang, asPage = false } = Astro.props;
+const Title = asPage ? 'h1' : 'h2';
+const cv = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${contacts.cv}`;
+
+const c = {
+  eyebrow: { ru: 'Контакты', en: 'Contact' },
+  title: { ru: 'Есть задача? <em>Обсудим.</em>', en: 'Got a task? <em>Let’s talk.</em>' },
+  lead: { ru: 'Напишите пару строк о проекте, я отвечу в течение дня.', en: 'Drop a couple of lines about your project and I’ll reply within a day.' },
+  cv: { ru: 'Резюме PDF', en: 'CV (PDF)' },
+  name: { ru: 'Как вас зовут', en: 'Your name' },
+  contact: { ru: 'Telegram, почта или телефон', en: 'Telegram, email or phone' },
+  company: { ru: 'Компания или проект', en: 'Company or project' },
+  message: { ru: 'Задача', en: 'Task' },
+  messagePh: { ru: 'Например: нужен аудит соцсетей бренда одежды', en: 'E.g. a social media audit for a clothing brand' },
+  submit: contacts.formEndpoint ? { ru: 'Отправить', en: 'Send' } : { ru: 'Отправить в Telegram', en: 'Send via Telegram' },
+  hint: contacts.formEndpoint
+    ? { ru: 'Заявка придёт мне на почту и используется только для ответа вам.', en: 'Your message comes to my inbox and is used only to reply to you.' }
+    : { ru: 'Данные уходят только мне и нигде не хранятся.', en: 'Your details go only to me and are not stored anywhere.' },
+  required: { ru: 'Заполните это поле', en: 'Please fill in this field' },
+  consentRequired: { ru: 'Без согласия я не смогу получить заявку', en: 'I can’t receive the message without your consent' },
+  sent: { ru: 'Готово! Я скоро напишу вам.', en: 'Done! I’ll get back to you soon.' },
+  copied: { ru: 'Текст заявки скопирован. Отправьте его в открывшемся чате.', en: 'Your message is copied. Paste it into the chat that just opened.' },
+  error: { ru: 'Не получилось отправить. Напишите мне напрямую: @sliptruncat', en: 'Couldn’t send. Message me directly: @sliptruncat' },
+  msgTitle: { ru: 'Заявка с сайта', en: 'Website enquiry' },
+};
+const msg = { required: tr(c.required, lang), consentRequired: tr(c.consentRequired, lang), sent: tr(c.sent, lang), copied: tr(c.copied, lang), error: tr(c.error, lang), title: tr(c.msgTitle, lang), name: tr(c.name, lang), contact: tr(c.contact, lang), company: tr(c.company, lang), message: tr(c.message, lang) };
+---
+<section class="container section contact" id="contact">
+  <div class="contact__intro">
+    <p class="label label--line reveal">{tr(c.eyebrow, lang)}</p>
+    <Title class="contact__title reveal" set:html={tr(c.title, lang)} />
+    <p class="lead reveal">{tr(c.lead, lang)}</p>
+    <ul class="contact__links reveal">
+      <li><a href={`https://t.me/${contacts.telegram}`} target="_blank" rel="noopener">Telegram ↗</a></li>
+      <li><a href={`https://vk.com/${contacts.vk}`} target="_blank" rel="noopener">VK ↗</a></li>
+      <li><a href={`mailto:${contacts.email}`}>{contacts.email}</a></li>
+      <li><a href={cv} download>{tr(c.cv, lang)} <span class="dl">↓</span></a></li>
+    </ul>
+  </div>
+
+  <div class="window contact__window reveal">
+    <div class="window__bar"><span class="window__dots" aria-hidden="true"><i></i><i></i><i></i></span><span>new_message.txt</span></div>
+    <form class="contact__form" novalidate data-contact-form data-endpoint={contacts.formEndpoint} data-telegram={contacts.telegram} data-msg={JSON.stringify(msg)}>
+      <label class="field"><span>{tr(c.name, lang)}</span><input name="name" type="text" autocomplete="name" required /></label>
+      <label class="field"><span>{tr(c.contact, lang)}</span><input name="contact" type="text" autocomplete="email" required placeholder="@username" /></label>
+      <label class="field"><span>{tr(c.company, lang)}</span><input name="company" type="text" autocomplete="organization" /></label>
+      <label class="field"><span>{tr(c.message, lang)}</span><textarea name="message" rows="4" required placeholder={tr(c.messagePh, lang)}></textarea></label>
+      <label class="consent">
+        <input name="consent" type="checkbox" value="yes" required />
+        <span>
+          {lang === 'ru'
+            ? <>Даю <a href={href('consent', lang)} target="_blank">согласие на обработку персональных данных</a> и принимаю <a href={href('privacy', lang)} target="_blank">политику конфиденциальности</a></>
+            : <>I give <a href={href('consent', lang)} target="_blank">consent to personal data processing</a> and accept the <a href={href('privacy', lang)} target="_blank">privacy policy</a></>}
+        </span>
+      </label>
+      <input class="visually-hidden" name="_gotcha" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <button class="btn btn--wide" type="submit">{tr(c.submit, lang)} <span class="arrow">↗</span></button>
+      <p class="contact__hint">{tr(c.hint, lang)}</p>
+      <p class="contact__status" role="status" aria-live="polite" data-status></p>
+    </form>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = '1';
+    const m = JSON.parse(form.dataset.msg ?? '{}');
+    const status = form.querySelector<HTMLElement>('[data-status]');
+
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries()) as Record<string, string>;
+      let ok = true;
+      ['name', 'contact', 'message'].forEach((k) => {
+        const el = form.elements.namedItem(k) as HTMLInputElement;
+        const field = el.closest('.field')!;
+        const bad = !String(data[k] ?? '').trim();
+        field.classList.toggle('is-invalid', bad);
+        el.setAttribute('aria-invalid', String(bad));
+        field.querySelector('.field__error')?.remove();
+        if (bad) {
+          ok = false;
+          const err = document.createElement('span');
+          err.className = 'field__error';
+          err.textContent = m.required;
+          field.append(err);
+        }
+      });
+      const consentBox = form.elements.namedItem('consent') as HTMLInputElement;
+      const consentLabel = consentBox.closest('.consent')!;
+      consentLabel.querySelector('.field__error')?.remove();
+      consentLabel.classList.toggle('is-invalid', !consentBox.checked);
+      consentBox.setAttribute('aria-invalid', String(!consentBox.checked));
+      if (!consentBox.checked) {
+        ok = false;
+        const err = document.createElement('span');
+        err.className = 'field__error';
+        err.textContent = m.consentRequired;
+        consentLabel.append(err);
+      }
+      if (!ok) { (form.querySelector('[aria-invalid="true"]') as HTMLElement | null)?.focus(); return; }
+
+      const text = [m.title, `${m.name}: ${data.name}`, `${m.contact}: ${data.contact}`, data.company ? `${m.company}: ${data.company}` : '', `${m.message}: ${data.message}`].filter(Boolean).join('\n');
+      const btn = form.querySelector<HTMLButtonElement>('button[type=submit]')!;
+      btn.disabled = true;
+      try {
+        if (form.dataset.endpoint) {
+          if (data._gotcha) { form.reset(); if (status) status.textContent = m.sent; btn.disabled = false; return; }
+          const res = await fetch(form.dataset.endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ _subject: `${m.title}: ${data.name}`, ...data, page: location.href }),
+          });
+          if (!res.ok) throw new Error(String(res.status));
+          form.reset();
+          if (status) status.textContent = m.sent;
+        } else {
+          // no relay configured yet: copy the message and open the Telegram chat
+          try { await navigator.clipboard.writeText(text); } catch { /* clipboard blocked */ }
+          window.open(`https://t.me/${form.dataset.telegram}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+          if (status) status.textContent = m.copied;
+        }
+      } catch {
+        if (status) status.textContent = m.error;
+      }
+      btn.disabled = false;
+    });
+  });
+</script>
+
+<style>
+  .contact { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 88px); align-items: start; }
+  .contact__title { font-size: clamp(2.6rem, 6vw, 5.2rem); line-height: 1; margin: 14px 0 20px; }
+  .contact__intro .lead { max-width: 28rem; }
+  .contact__links { list-style: none; margin: 30px 0 0; padding: 0; display: grid; gap: 12px; }
+  .contact__links a { font: 500 1.25rem/1.3 var(--f-display); font-variant-numeric: lining-nums; text-decoration: none; border-bottom: 1px solid transparent; transition: color 0.2s, border-color 0.2s; }
+  .contact__links a:hover { color: var(--berry); border-bottom-color: var(--berry); }
+  .dl { font-family: var(--f-body); font-size: 0.9em; }
+  .contact__form { display: grid; gap: 16px; padding: clamp(20px, 3vw, 32px); }
+  .contact__hint { font-size: 0.8rem; color: var(--text-mute); }
+  .consent { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: start; font-size: 0.85rem; color: var(--text-soft); cursor: pointer; }
+  .consent input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--berry); }
+  .consent a { color: var(--berry); }
+  .consent .field__error { grid-column: 2; }
+  .contact__status { font-size: 0.92rem; color: var(--berry); min-height: 1.2em; }
+  @media (max-width: 860px) { .contact { grid-template-columns: 1fr; } }
+</style>
