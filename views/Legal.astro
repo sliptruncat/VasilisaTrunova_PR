@@ -1,0 +1,38 @@
+---
+import Base from '@/layouts/Base.astro';
+import { privacy, consent } from '@/data/legal';
+import { href, tr, type Lang } from '@/i18n/ui';
+
+interface Props { lang: Lang; doc: 'privacy' | 'consent' }
+const { lang, doc } = Astro.props;
+const d = tr(doc === 'privacy' ? privacy : consent, lang);
+const other = doc === 'privacy'
+  ? { path: 'consent', label: tr(consent, lang).title }
+  : { path: 'privacy', label: tr(privacy, lang).title };
+---
+<Base lang={lang} title={d.title} description={d.lead}>
+  <article class="container section legal">
+    <span class="label label--line">{lang === 'ru' ? 'Документы' : 'Legal'}</span>
+    <h1>{d.title}</h1>
+    <p class="lead">{d.lead}</p>
+    <p class="legal__updated">{d.updated}</p>
+    {d.sections.map((s) => (
+      <section>
+        <h2>{s.h}</h2>
+        {s.p.map((p) => <p>{p}</p>)}
+      </section>
+    ))}
+    <p class="legal__other"><a href={href(other.path, lang)}>{other.label} →</a></p>
+  </article>
+</Base>
+
+<style>
+  .legal { max-width: 52rem; display: grid; gap: 14px; padding-top: clamp(32px, 5vw, 72px); }
+  .legal h1 { font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1.05; overflow-wrap: anywhere; hyphens: auto; }
+  .legal__updated { color: var(--text-mute); font-size: 0.85rem; }
+  .legal section { border-top: 1px solid var(--line); padding-top: 18px; margin-top: 10px; }
+  .legal h2 { font-size: clamp(1.2rem, 2.4vw, 1.5rem); margin-bottom: 10px; }
+  .legal section p { color: var(--text-soft); margin: 0 0 10px; max-width: 46rem; }
+  .legal__other { margin-top: 18px; }
+  .legal__other a { color: var(--berry); }
+</style>
