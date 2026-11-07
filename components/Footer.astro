@@ -33,6 +33,11 @@ const links = ['work', 'about', 'experience', 'skills', 'education', 'services',
     </span>
     <span>{t('footer.rights')} <span class="star" aria-hidden="true">✳</span></span>
   </div>
+  <div class="container site-footer__disclaimer">
+    {lang === 'ru'
+      ? <>Instagram* — сервис компании Meta Platforms Inc.*, признанной экстремистской организацией; её деятельность запрещена на территории Российской Федерации. <span>* Организация Meta Platforms Inc. признана экстремистской, её деятельность запрещена в РФ.</span></>
+      : <>Instagram* is a service of Meta Platforms Inc.*, which is recognized as an extremist organization and banned in the Russian Federation. <span>* Meta Platforms Inc. is recognized as an extremist organization; its activities are banned in Russia.</span></>}
+  </div>
 </footer>
 
 <style>
@@ -49,6 +54,8 @@ const links = ['work', 'about', 'experience', 'skills', 'education', 'services',
   .site-footer__bottom { display: flex; justify-content: space-between; gap: 12px; margin-top: var(--s-6); color: var(--text-mute); font-size: 0.8rem; }
   .site-footer__legal { display: flex; flex-wrap: wrap; gap: 4px 18px; }
   .site-footer__legal a { color: var(--text-mute); }
+  .site-footer__disclaimer { margin-top: 14px; color: var(--text-mute); font-size: 0.72rem; line-height: 1.5; max-width: 70rem; }
+  .site-footer__disclaimer span { display: block; }
   @media (max-width: 900px) {
     .site-footer__inner { grid-template-columns: 1fr; gap: var(--s-5); }
     nav { justify-self: start; }
