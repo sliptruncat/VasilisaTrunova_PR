@@ -58,6 +58,10 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
         <span class="hero__line reveal">{ru ? 'Трунова' : 'Trunova'}</span>
       </h1>
       <p class="lead reveal">{tr(hero.lead, lang)}</p>
+      <blockquote class="hero__quote reveal">
+        <span class="hero__quote-mark" aria-hidden="true">“</span>
+        <p>{ru ? 'Сначала стратегия, потом контент.' : 'Strategy first, content second.'}</p>
+      </blockquote>
       <div class="hero__cta reveal">
         <a class="btn" href="#work">{t('cta.cases')} <span class="arrow">↘</span></a>
         <a class="btn btn--ghost" href={href('about', lang)}>{t('cta.about')}</a>
@@ -180,13 +184,30 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
       <div><span class="label label--line reveal">Services</span><h2 class="reveal">{tr(copy.services, lang)}</h2></div>
       <a class="link reveal" href={href('services', lang)}>{tr(copy.allServices, lang)} <span class="arrow">↗</span></a>
     </div>
-    <ul class="services">
-      {services.slice(0, 6).map((s, i) => (
-        <li class="service reveal">
+    <p class="services__intro reveal">{ru
+      ? 'Можно подключиться к отдельной задаче или пройти весь путь вместе: от исследования и постановки целей до запуска и оценки результата.'
+      : 'I can join for a focused task or lead the whole process: from research and goal-setting to launch and evaluation.'}</p>
+    <ul class="service-formats">
+      {(ru ? [
+        ['Аудит и исследование', 'Разобраться, что происходит с брендом, рынком и коммуникациями.', 'Анализ аудитории, конкурентов, позиционирования, каналов и текущих показателей. На выходе: выводы, приоритеты и рекомендации.'],
+        ['Стратегия', 'Понять, куда двигаться и на чём сосредоточить ресурсы.', 'Коммуникационная или маркетинговая стратегия: цели, аудитории, сообщения, каналы, KPI, бюджет и план реализации.'],
+        ['Кампания под ключ', 'Решить конкретную задачу в заданные сроки.', 'Разработка концепции и механики кампании, медиаплан, контент, работа со СМИ и блогерами, координация подрядчиков и оценка результатов.'],
+        ['Запуск и продвижение', 'Вывести продукт, проект или событие к своей аудитории.', 'План запуска, рекламные размещения, контент, PR, партнёрства и сопровождение продвижения.'],
+        ['Сопровождение и управление', 'Нужен человек, который держит коммуникации и процессы в руках.', 'Ведение проекта или направления, управление командой и подрядчиками, контроль сроков, бюджета, KPI и отчётности.'],
+        ['Консультация', 'Нужен экспертный взгляд и понятный следующий шаг.', 'Разбор ситуации, ответы на вопросы, оценка гипотез и конкретный план действий по итогам встречи.'],
+      ] : [
+        ['Audit & research', 'Understand what is happening with the brand, market and communications.', 'Audience, competitor, positioning, channel and performance analysis. Deliverable: findings, priorities and recommendations.'],
+        ['Strategy', 'Decide where to go and how to focus resources.', 'Communications or marketing strategy: goals, audiences, messages, channels, KPIs, budget and implementation roadmap.'],
+        ['Campaign delivery', 'Solve a specific challenge within a clear timeline.', 'Campaign concept and mechanics, media plan, content, media and creator relations, supplier coordination and performance review.'],
+        ['Launch & promotion', 'Bring a product, project or event to its audience.', 'Launch plan, paid placements, content, PR, partnerships and promotion management.'],
+        ['Ongoing support & management', 'Bring in someone to own communications and keep delivery on track.', 'Project or function management, team and supplier coordination, timelines, budget, KPIs and reporting.'],
+        ['Consultation', 'Get an expert perspective and a clear next step.', 'Situation review, questions answered, hypothesis assessment and an actionable plan after the meeting.'],
+      ]).map((f, i) => (
+        <li class="service-format reveal">
           <span class="num">{String(i + 1).padStart(2, '0')}</span>
-          <h3>{tr(s.title, lang)}</h3>
-          <p class="service__task">{tr(s.task, lang)}</p>
-          <p class="service__out">→ {tr(s.outcome, lang)}</p>
+          <h3>{f[0]}</h3>
+          <p class="service-format__task">{f[1]}</p>
+          <p>{f[2]}</p>
         </li>
       ))}
     </ul>
@@ -294,6 +315,10 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
   .hero__contacts .ico { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--berry); color: var(--lemon); font-size: 0.85rem; }
   .hero__contacts a:hover .ico { background: var(--lemon); color: var(--berry); }
 
+  .hero__quote { display: flex; gap: 10px; align-items: flex-start; max-width: 28rem; margin: 22px 0 0; padding: 12px 16px 12px 0; border-top: 1px solid var(--line-strong); border-bottom: 1px solid var(--line-strong); }
+  .hero__quote-mark { color: var(--berry); font: 3rem/0.8 var(--f-display); }
+  .hero__quote p { margin: 0; color: var(--wine); font: 500 1.12rem/1.35 var(--f-display); letter-spacing: -0.01em; }
+
   /* folders */
   .folders { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--gap); list-style: none; margin: 0; padding: 24px 0 0; }
   .more__title { margin: var(--s-8) 0 var(--s-5); font-size: var(--fs-h3); }
@@ -373,6 +398,14 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
   .steps h3 { margin-bottom: 8px; font-size: 1.3rem; }
   .steps p { color: var(--text-soft); font-size: 0.95rem; }
 
+  .services__intro { max-width: 48rem; margin: -8px 0 26px; color: var(--text-soft); }
+  .service-formats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); list-style: none; margin: 0; padding: 0; }
+  .service-format { display: grid; align-content: start; gap: 12px; min-height: 250px; padding: 24px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-2); }
+  .service-format .num { color: var(--berry); }
+  .service-format h3 { font-size: var(--fs-h3); }
+  .service-format p { color: var(--text-soft); font-size: 0.92rem; }
+  .service-format__task { color: var(--wine) !important; font-weight: 600; }
+
   /* services */
   .services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; list-style: none; margin: 0; padding: 0; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
   .service { display: grid; gap: 10px; align-content: start; padding: 30px; background: var(--bg); transition: background 0.3s; }
@@ -435,7 +468,7 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
     .intro__media { width: min(360px, 88%); }
     .previews { grid-template-columns: 1fr; }
   }
-  @media (max-width: 560px) {
+  @media (max-width: 560px) { .service-formats { grid-template-columns: 1fr; }
     .folders, .more, .steps, .services, .teach-grid { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr 1fr; }
     .stat { min-height: 140px; padding: 16px; }
