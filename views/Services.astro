@@ -15,25 +15,6 @@ const formats = ru
 <Base lang={lang} title={ru ? 'Услуги' : 'Services'} description={ru ? 'Услуги Василисы Труновой: PR-, коммуникационная и маркетинговая стратегия, позиционирование, СМИ, цифровое продвижение, блогеры, ивенты.' : 'Services: PR, communications and marketing strategy, positioning, media, digital, influencers, events.'}>
   <PageHero label="Services" title={ru ? 'Услуги' : 'Services'} lead={ru ? 'Описываю услуги через задачу бизнеса и результат. Стоимость обсуждаем под задачу.' : 'Each service is described through a business task and its outcome. Pricing depends on the task.'} />
 
-  <section class="container section">
-    <ul class="svc">
-      {services.map((s, i) => (
-        <li class="svc__item reveal">
-          <span class="svc__n num">{String(i + 1).padStart(2, '0')}</span>
-          <h2>{tr(s.title, lang)}</h2>
-          <p class="svc__task"><span class="label">{ru ? 'Задача' : 'Task'}</span>{tr(s.task, lang)}</p>
-          <p class="svc__out"><span class="label">{ru ? 'Результат' : 'Outcome'}</span>{tr(s.outcome, lang)}</p>
-        </li>
-      ))}
-    </ul>
-  </section>
-
-  <section class="container section">
-    <h2 class="reveal fmt-h">{ru ? 'Форматы сотрудничества' : 'Ways to work together'}</h2>
-    <ul class="fmt">{formats.map(([t, d], i) => <li class="reveal"><span class="num">0{i + 1}</span><strong>{t}</strong><span>{d}</span></li>)}</ul>
-    <a class="link reveal" href={href('work', lang)}>{ru ? 'Посмотреть кейсы' : 'See the work'} <span class="arrow">↗</span></a>
-  </section>
-
   <!-- CONSULTATION BOOKING -->
   <section class="container section booking" id="booking">
     <div class="section-head">
@@ -165,6 +146,26 @@ const formats = ru
     renderSlots();
   });
 </script>
+
+
+  <section class="container section">
+    <ul class="svc">
+      {services.map((s, i) => (
+        <li class="svc__item reveal">
+          <span class="svc__n num">{String(i + 1).padStart(2, '0')}</span>
+          <h2>{tr(s.title, lang)}</h2>
+          <p class="svc__task"><span class="label">{ru ? 'Задача' : 'Task'}</span>{tr(s.task, lang)}</p>
+          <p class="svc__out"><span class="label">{ru ? 'Результат' : 'Outcome'}</span>{tr(s.outcome, lang)}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="container section">
+    <h2 class="reveal fmt-h">{ru ? 'Форматы сотрудничества' : 'Ways to work together'}</h2>
+    <ul class="fmt">{formats.map(([t, d], i) => <li class="reveal"><span class="num">0{i + 1}</span><strong>{t}</strong><span>{d}</span></li>)}</ul>
+    <a class="link reveal" href={href('work', lang)}>{ru ? 'Посмотреть кейсы' : 'See the work'} <span class="arrow">↗</span></a>
+  </section>
 
   <ContactBlock lang={lang} />
 </Base>
