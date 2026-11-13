@@ -63,8 +63,8 @@ export const moreWork: { file: string; tag: L; title: L; role: L; text: L; metri
 export const hero = {
   eyebrow: { ru: 'Personal portfolio / 2026', en: 'Personal portfolio / 2026' },
   lead: {
-    ru: 'PR, маркетинг и креативные коммуникации на стыке стратегии, контента и продакшна.',
-    en: 'PR, marketing and creative communications where strategy, content and production meet.',
+    ru: 'Исследую бизнес-среду, аудитории и конкурентное поле, чтобы находить точки роста и превращать их в работающие стратегии продвижения.',
+    en: 'I research business environments, audiences and competitors to identify growth opportunities and turn them into effective promotion strategies.',
   },
   note: ['Strategy', 'Marketing', 'PR', 'Creative'],
 };
