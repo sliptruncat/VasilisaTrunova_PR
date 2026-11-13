@@ -32,7 +32,7 @@ const copy = {
   numbers: { ru: 'Опыт в цифрах', en: 'Experience in numbers' },
   timeline: { ru: 'Таймлайн', en: 'Timeline' },
   pick: { ru: 'Нажмите на год, чтобы увидеть, чем я занималась', en: 'Pick a year to see what I was doing' },
-  services: { ru: 'Чем могу помочь', en: 'How I can help' },
+  services: { ru: 'Услуги и форматы сотрудничества', en: 'Services & ways to work together' },
   allServices: { ru: 'Все услуги', en: 'All services' },
   skills: { ru: 'Навыки и инструменты', en: 'Skills & tools' },
   education: { ru: 'Образование и события', en: 'Education & events' },
@@ -211,6 +211,42 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
         </li>
       ))}
     </ul>
+  </section>
+
+  <!-- PRODUCTS / DIGITAL MATERIALS -->
+  <section class="container section products" id="products">
+    <div class="section-head">
+      <div>
+        <span class="label label--line reveal">{ru ? 'Авторские материалы' : 'Resources'}</span>
+        <h2 class="reveal">{ru ? 'Продукты и материалы' : 'Products & resources'}</h2>
+        <p class="reveal products__lead">{ru
+          ? 'Практические материалы, в которых мой опыт и методики превращаются в инструменты для самостоятельной работы.'
+          : 'Practical resources that turn my experience and methods into tools for independent work.'}</p>
+      </div>
+    </div>
+    <div class="products__grid">
+      <article class="product-card product-card--featured reveal">
+        <span class="product-card__type">{ru ? 'Скоро' : 'Coming soon'}</span>
+        <span class="product-card__index display">01</span>
+        <h3>{ru ? 'Гайды и методики' : 'Guides & methods'}</h3>
+        <p>{ru ? 'PDF-разборы, авторские инструкции и рабочие подходы к PR, маркетингу и коммуникациям.' : 'PDF guides, original playbooks and practical approaches to PR, marketing and communications.'}</p>
+        <span class="product-card__note">{ru ? 'Материалы готовятся к публикации' : 'Resources are in preparation'}</span>
+      </article>
+      <article class="product-card reveal">
+        <span class="product-card__type">{ru ? 'Скоро' : 'Coming soon'}</span>
+        <span class="product-card__index display">02</span>
+        <h3>{ru ? 'Шаблоны и рабочие документы' : 'Templates & workbooks'}</h3>
+        <p>{ru ? 'Структуры аудитов, брифы, таблицы, чек-листы и инструменты для планирования кампаний.' : 'Audit frameworks, briefs, spreadsheets, checklists and campaign planning tools.'}</p>
+        <span class="product-card__note">{ru ? 'Раздел будет пополняться' : 'More resources will be added'}</span>
+      </article>
+      <article class="product-card product-card--channel reveal">
+        <span class="product-card__type">{ru ? 'В разработке' : 'In the works'}</span>
+        <span class="product-card__index display">03</span>
+        <h3>{ru ? 'Telegram-канал' : 'Telegram channel'}</h3>
+        <p>{ru ? 'Заметки о коммуникациях, разборы кейсов, инструменты, наблюдения и материалы, которые не вошли в портфолио.' : 'Notes on communications, case breakdowns, tools, observations and resources beyond the portfolio.'}</p>
+        <span class="product-card__note">{ru ? 'Скоро запустим' : 'Launching soon'}</span>
+      </article>
+    </div>
   </section>
 
   <!-- TEACHING (from the first portfolio) -->
@@ -406,7 +442,20 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
   .service-format p { color: var(--text-soft); font-size: 0.92rem; }
   .service-format__task { color: var(--wine) !important; font-weight: 600; }
 
-  /* services */
+  .products__lead { max-width: 42rem; color: var(--text-soft); }
+  .products__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap); }
+  .product-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; min-height: 290px; padding: clamp(22px, 3vw, 32px); border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface-2); overflow: hidden; }
+  .product-card--featured { background: var(--wine); color: #fffaf6; }
+  .product-card--channel { background: var(--surface); }
+  .product-card__type { font-size: .76rem; letter-spacing: .12em; text-transform: uppercase; color: var(--berry); }
+  .product-card--featured .product-card__type { color: var(--lemon); }
+  .product-card__index { margin: 26px 0 12px; font-size: 2.8rem; opacity: .34; }
+  .product-card h3 { font: 500 clamp(1.35rem, 2vw, 1.8rem)/1.15 var(--f-display); margin: 0 0 12px; }
+  .product-card p { max-width: 30rem; color: var(--text-soft); font-size: .94rem; }
+  .product-card--featured p { color: rgba(255,250,246,.82); }
+  .product-card__note { margin-top: auto; padding-top: 24px; font-size: .8rem; color: var(--text-mute); }
+  .product-card--featured .product-card__note { color: var(--lemon); }
+\n  /* services */
   .services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; list-style: none; margin: 0; padding: 0; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; }
   .service { display: grid; gap: 10px; align-content: start; padding: 30px; background: var(--bg); transition: background 0.3s; }
   .service:hover { background: var(--surface); }
@@ -468,7 +517,7 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
     .intro__media { width: min(360px, 88%); }
     .previews { grid-template-columns: 1fr; }
   }
-  @media (max-width: 560px) { .service-formats { grid-template-columns: 1fr; }
+  @media (max-width: 560px) { .products__grid { grid-template-columns: 1fr; } .service-formats { grid-template-columns: 1fr; }
     .folders, .more, .steps, .services, .teach-grid { grid-template-columns: 1fr; }
     .stats { grid-template-columns: 1fr 1fr; }
     .stat { min-height: 140px; padding: 16px; }
