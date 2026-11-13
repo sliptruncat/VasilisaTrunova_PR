@@ -74,8 +74,97 @@ const formats = ru
     </div>
   </section>
 
+  <!-- PRODUCTS & MATERIALS -->
+  <section class="container section product-library" id="products">
+    <div class="section-head">
+      <div>
+        <span class="label label--line reveal">{ru ? 'Авторские материалы' : 'Resources'}</span>
+        <h2 class="reveal">{ru ? 'Продукты и материалы' : 'Products & resources'}</h2>
+        <p class="reveal product-library__lead">{ru
+          ? 'Практические материалы, в которых мой опыт и методики превращаются в инструменты для самостоятельной работы.'
+          : 'Practical resources that turn my experience and methods into tools for independent work.'}</p>
+      </div>
+    </div>
+    <div class="product-library__tabs" role="tablist" aria-label={ru ? 'Категории продуктов' : 'Product categories'}>
+      <button class="product-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="free-products" data-product-tab="free">{ru ? 'Бесплатные продукты' : 'Free resources'}</button>
+      <button class="product-tab" type="button" role="tab" aria-selected="false" aria-controls="paid-products" data-product-tab="paid">{ru ? 'Платные продукты' : 'Paid products'}</button>
+    </div>
+    <div class="product-panel is-active" id="free-products" role="tabpanel" data-product-panel="free">
+      <div class="product-list">
+        <button class="product-entry" type="button" aria-expanded="false" data-product-entry="free-checklists">
+          <span class="product-entry__number">01</span>
+          <span class="product-entry__copy"><strong>{ru ? 'Чек-листы и полезные материалы' : 'Checklists & practical resources'}</strong><small>{ru ? 'Короткие инструменты для самостоятельной работы' : 'Quick tools for independent work'}</small></span>
+          <span class="product-entry__toggle">+</span>
+        </button>
+        <div class="product-detail" data-product-detail="free-checklists" hidden>
+          <p>{ru ? 'Подборки вопросов, критерии проверки и небольшие инструкции по PR, маркетингу и коммуникациям. Состав и файлы добавим позже.' : 'Question sets, review criteria and short guides on PR, marketing and communications. Details and files will be added later.'}</p>
+          <span class="product-detail__status">{ru ? 'Материалы готовятся' : 'Coming soon'}</span>
+        </div>
+        <button class="product-entry" type="button" aria-expanded="false" data-product-entry="free-channel">
+          <span class="product-entry__number">02</span>
+          <span class="product-entry__copy"><strong>{ru ? 'Telegram-канал' : 'Telegram channel'}</strong><small>{ru ? 'Заметки, разборы, инструменты и наблюдения' : 'Notes, case breakdowns, tools and observations'}</small></span>
+          <span class="product-entry__toggle">+</span>
+        </button>
+        <div class="product-detail" data-product-detail="free-channel" hidden>
+          <p>{ru ? 'Канал о коммуникациях, продвижении и работе с проектами. Ссылку добавим после запуска.' : 'A channel about communications, promotion and project work. The link will be added after launch.'}</p>
+          <span class="product-detail__status">{ru ? 'Скоро запустим' : 'Launching soon'}</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-panel" id="paid-products" role="tabpanel" data-product-panel="paid" hidden>
+      <div class="product-list">
+        <button class="product-entry" type="button" aria-expanded="false" data-product-entry="paid-guides">
+          <span class="product-entry__number">01</span>
+          <span class="product-entry__copy"><strong>{ru ? 'Гайды и авторские методики' : 'Guides & original methods'}</strong><small>{ru ? 'PDF-разборы, инструкции и практические руководства' : 'PDF breakdowns, instructions and practical playbooks'}</small></span>
+          <span class="product-entry__toggle">+</span>
+        </button>
+        <div class="product-detail" data-product-detail="paid-guides" hidden>
+          <p>{ru ? 'Подробные материалы по аудиту, стратегии, PR и маркетингу. Позже добавим описание каждого продукта, программу, формат и стоимость.' : 'In-depth resources on audits, strategy, PR and marketing. Product descriptions, contents, format and pricing will be added later.'}</p>
+          <span class="product-detail__status">{ru ? 'В разработке' : 'In development'}</span>
+        </div>
+        <button class="product-entry" type="button" aria-expanded="false" data-product-entry="paid-templates">
+          <span class="product-entry__number">02</span>
+          <span class="product-entry__copy"><strong>{ru ? 'Шаблоны и рабочие документы' : 'Templates & workbooks'}</strong><small>{ru ? 'Структуры аудитов, брифы, таблицы и инструменты планирования' : 'Audit frameworks, briefs, spreadsheets and planning tools'}</small></span>
+          <span class="product-entry__toggle">+</span>
+        </button>
+        <div class="product-detail" data-product-detail="paid-templates" hidden>
+          <p>{ru ? 'Практические файлы для специалистов и команд. Позже добавим примеры, состав комплектов и условия приобретения.' : 'Practical files for professionals and teams. Previews, bundle contents and purchase details will be added later.'}</p>
+          <span class="product-detail__status">{ru ? 'В разработке' : 'In development'}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
 <script>
   document.addEventListener('astro:page-load', () => {
+    const library = document.querySelector<HTMLElement>('#products');
+    if (library && !library.dataset.ready) {
+      library.dataset.ready = '1';
+      const tabs = [...library.querySelectorAll<HTMLButtonElement>('[data-product-tab]')];
+      const panels = [...library.querySelectorAll<HTMLElement>('[data-product-panel]')];
+      tabs.forEach(tab => tab.addEventListener('click', () => {
+        const key = tab.dataset.productTab;
+        tabs.forEach(t => {
+          const active = t === tab;
+          t.classList.toggle('is-active', active);
+          t.setAttribute('aria-selected', String(active));
+        });
+        panels.forEach(panel => {
+          const active = panel.dataset.productPanel === key;
+          panel.classList.toggle('is-active', active);
+          panel.hidden = !active;
+        });
+      }));
+      library.querySelectorAll<HTMLButtonElement>('[data-product-entry]').forEach(entry => entry.addEventListener('click', () => {
+        const key = entry.dataset.productEntry;
+        const detail = library.querySelector<HTMLElement>('[data-product-detail="' + key + '"]');
+        if (!detail) return;
+        const expanded = entry.getAttribute('aria-expanded') === 'true';
+        entry.setAttribute('aria-expanded', String(!expanded));
+        detail.hidden = expanded;
+        entry.querySelector('.product-entry__toggle')!.textContent = expanded ? '+' : '−';
+      }));
+    }
     const root = document.querySelector<HTMLElement>('#booking');
     if (!root || root.dataset.ready) return;
     root.dataset.ready = '1';
@@ -187,6 +276,24 @@ const formats = ru
   .fmt .num { color: var(--berry); font-size: 1.3rem; }
   .fmt strong { font: 500 1.25rem/1.2 var(--f-display); }
   .fmt span:last-child { color: var(--text-soft); font-size: 0.92rem; }
+  .product-library__lead { max-width: 46rem; color: var(--text-soft); }
+  .product-library__tabs { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 22px; border-bottom: 1px solid var(--line); }
+  .product-tab { position: relative; padding: 14px 20px; border: 0; background: transparent; color: var(--text-soft); cursor: pointer; font: 500 1rem var(--f-body); }
+  .product-tab::after { content: ''; position: absolute; right: 18px; bottom: -1px; left: 18px; height: 2px; background: transparent; }
+  .product-tab.is-active { color: var(--wine); }
+  .product-tab.is-active::after { background: var(--berry); }
+  .product-panel[hidden], .product-detail[hidden] { display: none; }
+  .product-list { border-top: 1px solid var(--line); }
+  .product-entry { display: grid; grid-template-columns: 54px 1fr 28px; gap: 16px; align-items: center; width: 100%; padding: 22px 8px; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; }
+  .product-entry:hover { background: var(--surface-2); }
+  .product-entry__number { color: var(--berry); font: 500 1.15rem var(--f-display); }
+  .product-entry__copy { display: grid; gap: 5px; }
+  .product-entry__copy strong { font: 500 1.2rem/1.25 var(--f-display); }
+  .product-entry__copy small { color: var(--text-soft); font-size: .88rem; }
+  .product-entry__toggle { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--line-strong); border-radius: 50%; font-size: 1.1rem; }
+  .product-detail { padding: 0 52px 22px 78px; border-bottom: 1px solid var(--line); color: var(--text-soft); }
+  .product-detail p { max-width: 48rem; margin: 0 0 12px; font-size: .94rem; line-height: 1.65; }
+  .product-detail__status { color: var(--berry); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }
   .booking__lead { max-width: 44rem; color: var(--text-soft); }
   .booking__packages { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 28px 0; }
   .booking-package { display: grid; gap: 10px; align-content: start; text-align: left; padding: 22px; min-height: 190px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); color: var(--text); cursor: pointer; transition: border-color .2s, background .2s, transform .2s; }
