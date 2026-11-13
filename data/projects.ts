@@ -233,10 +233,11 @@ export const projects: Project[] = [
       { title: { ru: 'Аргументация для бизнеса', en: 'Business case' }, text: { ru: 'Выставка как инструмент КСО, укрепления HR-бренда и культурной коммуникации компании в городской среде.', en: 'The exhibition as a tool for CSR, employer branding and a company’s cultural communication in the city.' } },
       { title: { ru: 'Аналитика для партнёра', en: 'Partner analytics' }, text: { ru: 'Проходимость, анализ и сегментация аудитории, цифровые показатели каналов и материалов в СМИ, PR-план привлечения стейкхолдеров.', en: 'Footfall, audience analysis and segmentation, digital channel metrics and press coverage, a stakeholder PR plan.' } },
       { title: { ru: 'Упаковка и медиа', en: 'Packaging & media' }, text: { ru: 'Фирменный стиль, презентация и карта локаций; питчи и публикации, которые подтверждают ценность участия.', en: 'Visual identity, a deck and a location map; pitches and coverage that prove the value of taking part.' } },
+      { title: { ru: 'Платное продвижение', en: 'Paid promotion' }, text: { ru: 'Запуск и ведение кампании в Яндекс Директ для привлечения внимания к проекту. За период 15 сентября — 2 октября 2025 года: 136 087 показов, 6 238 кликов при CTR 4,58% и средней цене клика 1,54 ₽.', en: 'Launched and managed a Yandex Direct campaign to increase awareness of the project. From 15 September to 2 October 2025: 136,087 impressions and 6,238 clicks, with a 4.58% CTR and an average CPC of RUB 1.54.' } },
     ],
     implementation: {
-      ru: ['Прайс-лист с тремя пакетами участия', 'Линейка дополнительных услуг: открытие, публикации, кураторство, аналитика', 'Коммерческое предложение и презентация для B2B-клиентов', 'Фирменный стиль и карта локаций', 'Питчи и рассылки по редакциям, сопровождение публикаций'],
-      en: ['A price list with three participation packages', 'Add-on services: opening, coverage, curator support, analytics', 'A commercial proposal and deck for B2B clients', 'Visual identity and a location map', 'Media pitches, outreach and coverage follow-up'],
+      ru: ['Прайс-лист с тремя пакетами участия', 'Линейка дополнительных услуг: открытие, публикации, кураторство, аналитика', 'Коммерческое предложение и презентация для B2B-клиентов', 'Фирменный стиль и карта локаций', 'Питчи и рассылки по редакциям, сопровождение публикаций', 'Настройка и ведение рекламной кампании в Яндекс Директ, анализ показателей и стоимости перехода'],
+      en: ['A price list with three participation packages', 'Add-on services: opening, coverage, curator support, analytics', 'A commercial proposal and deck for B2B clients', 'Visual identity and a location map', 'Media pitches, outreach and coverage follow-up', 'Set up and managed a Yandex Direct campaign, monitoring performance and cost per click'],
     },
     materials: [
       { src: bulvarSlide10, alt: { ru: 'Слайд презентации: медиаподдержка и СМИ', en: 'Deck slide: media support and outlets' } },
@@ -249,12 +250,16 @@ export const projects: Project[] = [
     ],
     materialsCredit: { ru: 'Слайды и фото из презентации проекта «Бульвар искусств»', en: 'Slides and photos from the “Boulevard of Arts” deck' },
     results: [
+      { value: '136 087', label: { ru: 'показов рекламной кампании в Яндекс Директ', en: 'Yandex Direct ad impressions' } },
+      { value: '6 238', label: { ru: 'кликов по рекламе', en: 'ad clicks' } },
+      { value: '4,58%', label: { ru: 'CTR рекламной кампании', en: 'campaign CTR' } },
+      { value: '1,54 ₽', label: { ru: 'средняя стоимость клика', en: 'average cost per click' } },
       { value: '3', label: { ru: 'пакета участия для B2B-клиентов', en: 'participation packages for B2B clients' } },
       { value: '«Ъ»', label: { ru: 'публикация в «Коммерсанте»', en: 'coverage in Kommersant' } },
     ],
     resultsNote: {
-      ru: 'Выставка упакована в продукт для бизнеса: прайс-лист с пакетами, дополнительные услуги, коммерческое предложение и презентация для переговоров. Организована работа с редакциями, есть публикации в «Коммерсанте» и культурных изданиях. Трафик в презентации — характеристика площадок, а не измеренный результат выставки.',
-      en: 'The exhibition became a product for business: a price list with packages, add-on services, a commercial proposal and a deck for negotiations. Media work was set up, with coverage in Kommersant and cultural outlets. Traffic figures in the deck describe the venues, not measured results.',
+      ru: 'Рекламная статистика приведена по выгрузке из Яндекс Директ за 15 сентября — 2 октября 2025 года: 136 087 показов, 6 238 кликов, CTR 4,58%, расход 9 626,85 ₽, средняя цена клика 1,54 ₽. В отчёте зафиксирована 1 конверсия; рекламные переходы не следует приравнивать к заявкам или продажам. Выставка также упакована в продукт для бизнеса: прайс-лист с пакетами, дополнительные услуги, коммерческое предложение и презентация для переговоров. Организована работа с редакциями, есть публикации в «Коммерсанте» и культурных изданиях. Трафик в презентации — характеристика площадок, а не измеренный результат выставки.',
+      en: 'Advertising figures are taken from the Yandex Direct export for 15 September to 2 October 2025: 136,087 impressions, 6,238 clicks, 4.58% CTR, RUB 9,626.85 spend and RUB 1.54 average CPC. The report records one conversion; ad clicks should not be presented as leads or sales. The exhibition was also packaged as a business offer, with participation tiers, add-on services, a commercial proposal and a negotiation deck. Media outreach secured coverage in Kommersant and cultural outlets. Footfall figures in the deck describe the venues, not measured exhibition results.',
     },
     tools: ['Figma', 'Miro', 'Pressfeed', 'Медиалогия'],
     takeaways: {
