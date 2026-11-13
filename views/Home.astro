@@ -170,14 +170,6 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
     </Window>
   </section>
 
-  <!-- APPROACH (style of the first portfolio) -->
-  <section class="container section">
-    <div class="section-head"><div><span class="label label--line reveal">{ru ? 'Подход' : 'Approach'}</span><h2 class="reveal">{tr(approach.title, lang)}</h2></div></div>
-    <ol class="steps">
-      {approach.steps.map((s) => <li class="reveal"><h3>{tr(s.title, lang)}</h3><p>{tr(s.text, lang)}</p></li>)}
-    </ol>
-  </section>
-
   <!-- SERVICES -->
   <section class="container section">
     <div class="section-head">
@@ -247,6 +239,14 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
         <span class="product-card__note">{ru ? 'Скоро запустим' : 'Launching soon'}</span>
       </article>
     </div>
+  </section>
+
+  <!-- APPROACH (style of the first portfolio) -->
+  <section class="container section">
+    <div class="section-head"><div><span class="label label--line reveal">{ru ? 'Подход' : 'Approach'}</span><h2 class="reveal">{tr(approach.title, lang)}</h2></div></div>
+    <ol class="steps">
+      {approach.steps.map((s) => <li class="reveal"><h3>{tr(s.title, lang)}</h3><p>{tr(s.text, lang)}</p></li>)}
+    </ol>
   </section>
 
   <!-- TEACHING (from the first portfolio) -->
