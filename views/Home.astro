@@ -114,6 +114,43 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
     </ul>
   </section>
 
+  <!-- PRODUCTS / DIGITAL MATERIALS -->
+  <section class="container section products" id="products">
+    <div class="section-head">
+      <div>
+        <span class="label label--line reveal">{ru ? 'Авторские материалы' : 'Resources'}</span>
+        <h2 class="reveal">{ru ? 'Продукты и материалы' : 'Products & resources'}</h2>
+        <p class="reveal products__lead">{ru
+          ? 'Практические материалы, в которых мой опыт и методики превращаются в инструменты для самостоятельной работы.'
+          : 'Practical resources that turn my experience and methods into tools for independent work.'}</p>
+      </div>
+    </div>
+    <div class="products__grid">
+      <article class="product-card product-card--featured reveal">
+        <span class="product-card__type">{ru ? 'Скоро' : 'Coming soon'}</span>
+        <span class="product-card__index display">01</span>
+        <h3>{ru ? 'Гайды и методики' : 'Guides & methods'}</h3>
+        <p>{ru ? 'PDF-разборы, авторские инструкции и рабочие подходы к PR, маркетингу и коммуникациям.' : 'PDF guides, original playbooks and practical approaches to PR, marketing and communications.'}</p>
+        <span class="product-card__note">{ru ? 'Материалы готовятся к публикации' : 'Resources are in preparation'}</span>
+      </article>
+      <article class="product-card reveal">
+        <span class="product-card__type">{ru ? 'Скоро' : 'Coming soon'}</span>
+        <span class="product-card__index display">02</span>
+        <h3>{ru ? 'Шаблоны и рабочие документы' : 'Templates & workbooks'}</h3>
+        <p>{ru ? 'Структуры аудитов, брифы, таблицы, чек-листы и инструменты для планирования кампаний.' : 'Audit frameworks, briefs, spreadsheets, checklists and campaign planning tools.'}</p>
+        <span class="product-card__note">{ru ? 'Раздел будет пополняться' : 'More resources will be added'}</span>
+      </article>
+      <article class="product-card product-card--channel reveal">
+        <span class="product-card__type">{ru ? 'В разработке' : 'In the works'}</span>
+        <span class="product-card__index display">03</span>
+        <h3>{ru ? 'Telegram-канал' : 'Telegram channel'}</h3>
+        <p>{ru ? 'Заметки о коммуникациях, разборы кейсов, инструменты, наблюдения и материалы, которые не вошли в портфолио.' : 'Notes on communications, case breakdowns, tools, observations and resources beyond the portfolio.'}</p>
+        <span class="product-card__note">{ru ? 'Скоро запустим' : 'Launching soon'}</span>
+      </article>
+    </div>
+  </section>
+
+
   <!-- INTRO -->
   <section class="container section intro">
     <div class="intro__media reveal">
@@ -203,42 +240,6 @@ const yearCount = (y: number) => roles.filter((r) => r.years.includes(y)).length
         </li>
       ))}
     </ul>
-  </section>
-
-  <!-- PRODUCTS / DIGITAL MATERIALS -->
-  <section class="container section products" id="products">
-    <div class="section-head">
-      <div>
-        <span class="label label--line reveal">{ru ? 'Авторские материалы' : 'Resources'}</span>
-        <h2 class="reveal">{ru ? 'Продукты и материалы' : 'Products & resources'}</h2>
-        <p class="reveal products__lead">{ru
-          ? 'Практические материалы, в которых мой опыт и методики превращаются в инструменты для самостоятельной работы.'
-          : 'Practical resources that turn my experience and methods into tools for independent work.'}</p>
-      </div>
-    </div>
-    <div class="products__grid">
-      <article class="product-card product-card--featured reveal">
-        <span class="product-card__type">{ru ? 'Скоро' : 'Coming soon'}</span>
-        <span class="product-card__index display">01</span>
-        <h3>{ru ? 'Гайды и методики' : 'Guides & methods'}</h3>
-        <p>{ru ? 'PDF-разборы, авторские инструкции и рабочие подходы к PR, маркетингу и коммуникациям.' : 'PDF guides, original playbooks and practical approaches to PR, marketing and communications.'}</p>
-        <span class="product-card__note">{ru ? 'Материалы готовятся к публикации' : 'Resources are in preparation'}</span>
-      </article>
-      <article class="product-card reveal">
-        <span class="product-card__type">{ru ? 'Скоро' : 'Coming soon'}</span>
-        <span class="product-card__index display">02</span>
-        <h3>{ru ? 'Шаблоны и рабочие документы' : 'Templates & workbooks'}</h3>
-        <p>{ru ? 'Структуры аудитов, брифы, таблицы, чек-листы и инструменты для планирования кампаний.' : 'Audit frameworks, briefs, spreadsheets, checklists and campaign planning tools.'}</p>
-        <span class="product-card__note">{ru ? 'Раздел будет пополняться' : 'More resources will be added'}</span>
-      </article>
-      <article class="product-card product-card--channel reveal">
-        <span class="product-card__type">{ru ? 'В разработке' : 'In the works'}</span>
-        <span class="product-card__index display">03</span>
-        <h3>{ru ? 'Telegram-канал' : 'Telegram channel'}</h3>
-        <p>{ru ? 'Заметки о коммуникациях, разборы кейсов, инструменты, наблюдения и материалы, которые не вошли в портфолио.' : 'Notes on communications, case breakdowns, tools, observations and resources beyond the portfolio.'}</p>
-        <span class="product-card__note">{ru ? 'Скоро запустим' : 'Launching soon'}</span>
-      </article>
-    </div>
   </section>
 
   <!-- APPROACH (style of the first portfolio) -->
